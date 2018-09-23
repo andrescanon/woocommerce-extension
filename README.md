@@ -48,9 +48,3 @@ Add additional notes about how to deploy this on a live system
 * **Hannes Saariste** - *Fron end, help with back end* - [ilysion](https://github.com/ilysion)
 * **Stiivo Siider** - *Back end help, testing * - [StiivoSiider](https://github.com/StiivoSiider)
 * **Martin Jürgel** - *Back end help, documentation* - [martin457](https://github.com/martin457)
-
-## License
-
-© 2018 Leiten, Saariste, Siider, Jürgel All Rights Reserved
-
-
