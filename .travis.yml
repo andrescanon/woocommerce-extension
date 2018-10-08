@@ -11,9 +11,9 @@ env:
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
     - git clone https://github.com/WordPress/WordPress.git /tmp/wordpress
-    - git clone . "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     - cd /tmp/wordpress
     - git checkout $WP_VERSION
+    - git clone . "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     - cd /tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG
     - git checkout dev
     - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
