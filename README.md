@@ -22,13 +22,11 @@ Instruction 2
 finnally something here
 
 
-## Test Running
+## Travis-CI
 
-Will be coming soon, not yet implemented.
+Dev branch status 
+[![Build Status](https://travis-ci.com/stacc-dasso/woocommerce-extension.svg?branch=dev)](https://travis-ci.com/stacc-dasso/woocommerce-extension)
 
-```
-Example instructions.
-```
 
 ## Deployment
 
