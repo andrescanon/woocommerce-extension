@@ -3,7 +3,6 @@
 STACC's WooCommerce extension that connects STACC's recommendation system with the front end of webstores using WordPress + WooCommerce
 
 
-
 ### Installing
 
 A step by step tutorial to get the extesion up and running.
@@ -22,13 +21,10 @@ Instruction 2
 finnally something here
 
 
-## Test Running
+## Travis-CI
 
-Will be coming soon, not yet implemented.
-
-```
-Example instructions.
-```
+Dev branch status 
+[![Build Status](https://travis-ci.com/stacc-dasso/woocommerce-extension.svg?branch=dev)](https://travis-ci.com/stacc-dasso/woocommerce-extension)
 
 ## Deployment
 
