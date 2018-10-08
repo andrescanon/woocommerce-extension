@@ -3,15 +3,14 @@ sudo: required
 language: php
 
 php:
-  - "5.5"
-  - "7.4"
+  - "7.1"
   
 env:
   - WP_VERSION=latest
   
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
-    - git clone https://github.com/tierra/wordpress.git /tmp/wordpress
+    - git clone https://github.com/WordPress/WordPress.git /tmp/wordpress
     - cd ..
     - mv $PLUGIN_SLUG "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     - cd /tmp/wordpress
