@@ -16,9 +16,9 @@ before_script:
     - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
     - cd /tmp/wordpress
     - cp wp-config-sample.php wp-config.php
-    - sed -i "s/database_name_here/wordpress_tests/" wp-tests-config.php
-    - sed -i "s/username_here/travis/" wp-tests-config.php
-    - sed -i "s/password_here//" wp-tests-config.php
+    - sed -i "s/database_name_here/wordpress_tests/" wp-config.php
+    - sed -i "s/username_here/travis/" wp-config.php
+    - sed -i "s/password_here//" wp-config.php
     - cd "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     
 script: phpunit
