@@ -20,5 +20,6 @@ before_script:
     - sed -i "s/username_here/travis/" wp-config.php
     - sed -i "s/password_here//" wp-config.php
     - cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
+    - ls
     
 script: phpunit -c phpunit.xml
