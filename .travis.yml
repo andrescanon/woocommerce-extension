@@ -11,14 +11,14 @@ env:
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
     - git clone https://github.com/WordPress/WordPress.git /tmp/wordpress
-    - mkdir -p /tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG
-    - cp -a src/. /tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG
+    - mkdir -p /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG
+    - cp -a src/. /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG
     - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
     - cd /tmp/wordpress
     - cp wp-config-sample.php wp-config.php
     - sed -i "s/database_name_here/wordpress_tests/" wp-config.php
     - sed -i "s/username_here/travis/" wp-config.php
     - sed -i "s/password_here//" wp-config.php
-    - cd "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
+    - cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
     
 script: phpunit
