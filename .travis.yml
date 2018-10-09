@@ -15,10 +15,10 @@ before_script:
     - cp -a src/. /tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG
     - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
     - cd /tmp/wordpress
-    - cp wp-tests-config-sample.php wp-tests-config.php
-    - sed -i "s/wordpress_tests/" wp-tests-config.php
-    - sed -i "s/travis/" wp-tests-config.php
-    - sed -i "s//" wp-tests-config.php
+    - cp wp-config-sample.php wp-config.php
+    - sed -i "s/database_name_here/wordpress_tests/" wp-tests-config.php
+    - sed -i "s/username_here/travis/" wp-tests-config.php
+    - sed -i "s/password_here//" wp-tests-config.php
     - cd "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     
 script: phpunit
