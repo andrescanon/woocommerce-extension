@@ -11,8 +11,10 @@ env:
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
     - git clone https://github.com/WordPress/WordPress.git /tmp/wordpress
-    - mkdir -p /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG
+    - mkdir -p /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG/tests
     - cp -a src/. /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG
+    - cp -a tests/. /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG/tests
+    - cp -a phpunit.xml /tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG
     - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
     - cd /tmp/wordpress
     - cp wp-config-sample.php wp-config.php
@@ -22,4 +24,4 @@ before_script:
     - cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
     - ls
     
-script: phpunit -c phpunit.xml
+script: phpunit
