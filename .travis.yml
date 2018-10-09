@@ -11,7 +11,6 @@ env:
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
     - git clone https://github.com/WordPress/WordPress.git /tmp/wordpress
-    - cd /tmp/wordpress
     - git clone . "/tmp/$PLUGIN_SLUG"
     - mkdir /tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG
     - cp -a /tmp/$PLUGIN_SLUG/src/. /tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG
