@@ -9,7 +9,7 @@
 
 // Activates this plugin in WordPress so it can be tested.
 $GLOBALS['wp_tests_options'] = array(
-	'active_plugins' => array( 'plugin-slug/main-plugin-file.php' ),
+	'active_plugins' => array( 'woocommerce-extension/stacc-recommendation.php' ),
 );
 
 // If the develop repo location is defined (as WP_DEVELOP_DIR), use that
@@ -17,7 +17,7 @@ $GLOBALS['wp_tests_options'] = array(
 // WordPress develop SVN checkout.
 
 if( false !== getenv( 'WP_DEVELOP_DIR' ) ) {
-	require getenv( 'WP_DEVELOP_DIR' ) . '/tests/phpunit/includes/bootstrap.php';
+	require getenv( 'WP_DEVELOP_DIR' ) . 'bootstrap.php';
 } else {
-	require '../../../../tests/phpunit/includes/bootstrap.php';
+	require 'bootstrap.php';
 }
