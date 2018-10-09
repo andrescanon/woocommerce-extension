@@ -1,8 +1,7 @@
+[![Build Status](https://travis-ci.com/stacc-dasso/woocommerce-extension.svg?branch=dev)](https://travis-ci.com/stacc-dasso/woocommerce-extension)
 # STACC's WooCommerce extension
 
 STACC's WooCommerce extension that connects STACC's recommendation system with the front end of webstores using WordPress + WooCommerce
-
-
 
 ### Installing
 
@@ -20,13 +19,6 @@ Next do this etc.
 Instruction 2
 ```
 finnally something here
-
-
-## Travis-CI
-
-Dev branch status 
-[![Build Status](https://travis-ci.com/stacc-dasso/woocommerce-extension.svg?branch=dev)](https://travis-ci.com/stacc-dasso/woocommerce-extension)
-
 
 ## Deployment
 
