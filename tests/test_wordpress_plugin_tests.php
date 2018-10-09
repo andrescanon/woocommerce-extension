@@ -5,7 +5,7 @@
  *
  * @package wordpress-plugins-tests
  */
-class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase {
+class WP_Test_WordPress_Plugin_Tests {
 
 	/**
 	 * Run a simple test to ensure that the tests are running
