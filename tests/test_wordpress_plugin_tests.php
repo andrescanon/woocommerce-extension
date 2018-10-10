@@ -7,36 +7,17 @@
  */
 class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase{
 
+	protected function __construct()
+	{
+		$GLOBALS['wp_tests_options'] = array('active_plugins' => array( 'woocommerce-extension/stacc-recommendation.php' ),);
+	}
+	
 	/**
 	 * Run a simple test to ensure that the tests are running
 	 */
-	 function test_tests() {
+	function test_tests() {
 
 		$this->assertTrue( true );
-
-	 }
-
-	/**
-	 * If these tests are being run on Travis CI, verify that the version of
-	 * WordPress installed is the version that we requested.
-	 *
-	 * @requires PHP 5.3
-	 */
-	function test_wp_version() {
-
-		if ( !getenv( 'TRAVIS' ) )
-			$this->markTestSkipped( 'Test skipped since Travis CI was not detected.' );
-
-		$requested_version = getenv( 'WP_VERSION' ) . '-src';
-
-		// The "master" version requires special handling.
-		if ( $requested_version == 'master-src' ) {
-			$file = file_get_contents( 'https://raw.github.com/tierra/wordpress/master/src/wp-includes/version.php' );
-			preg_match( '#\$wp_version = \'([^\']+)\';#', $file, $matches );
-			$requested_version = $matches[1];
-		}
-
-		$this->assertEquals( get_bloginfo( 'version' ), $requested_version );
 
 	}
 
@@ -45,7 +26,7 @@ class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase{
 	 */
 	function test_plugin_activated() {
 
-		$this->assertTrue( is_plugin_active( 'plugin-slug/main-plugin-file.php' ) );
+		$this->assertTrue( is_plugin_active( 'woocommerce-extension/stacc-recommendation.php' ) );
 
 	}
 
