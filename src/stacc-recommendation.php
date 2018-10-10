@@ -14,42 +14,56 @@
  * Author URI:        stacc.ee
  */
 
-if ( ! defined( 'WPINC' ) ) {
-	die;
+if (!defined('WPINC')) {
+    die;
 }
 
 /**
  * Current plugin version.
  */
-define( 'PLUGIN_NAME_VERSION', '0.1.0' );
+define('PLUGIN_NAME_VERSION', '0.1.0');
 
 /**
  * The code that runs during plugin activation.
  */
-function activate() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-activator.php';
-	Activator::activate();
+function activate()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-activator.php';
+    Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
  */
-function deactivate() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-deactivator.php';
-	Deactivator::deactivate();
+function deactivate()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-deactivator.php';
+    Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate' );
-register_deactivation_hook( __FILE__, 'deactivate' );
+register_activation_hook(__FILE__, 'activate');
+register_deactivation_hook(__FILE__, 'deactivate');
 
 /**
- * The code that runs during every time admin area is loaded
+ * The core plugin class that is used to define admin-specific hooks
  */
+require plugin_dir_path(__FILE__) . 'includes/class-recommender.php';
 
-function onLoad() {
-	if ( ( !is_plugin_active("woocommerce/woocommerce.php") ) ) {
-		deactivate_plugins( plugin_basename( __FILE__ ) );
-	}
+/**
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since    0.1.0
+ */
+function run_recommender()
+{
+
+    $plugin = new Recommender();
+    $plugin->run();
+
 }
 
-add_action( 'admin_init', 'onLoad');
+run_recommender();
