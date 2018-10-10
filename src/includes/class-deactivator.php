@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fired during plugin deactivation.
  *
@@ -9,14 +10,16 @@
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  */
-class Deactivator {
+class Deactivator
+{
 
-	/**
-	 * Runs on deactivation.
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
+    /**
+     * Runs on deactivation.
+     * @since    1.0.0
+     */
+    public static function deactivate()
+    {
 
-	}
+    }
 
 }
