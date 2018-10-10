@@ -21,6 +21,6 @@ before_script:
     - sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
     - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
     - sed -i "s/yourpasswordhere//" wp-tests-config.php
-    - cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
+    #- cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
     
 script: phpunit
