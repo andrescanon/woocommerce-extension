@@ -24,4 +24,4 @@ before_script:
     - cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
     - ls
     
-script: phpunit --debug
+script: phpunit --configuration phpunit.xml
