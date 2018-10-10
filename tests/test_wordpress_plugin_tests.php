@@ -9,7 +9,9 @@ class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase{
 
 	function __construct()
 	{
-		$GLOBALS['wp_tests_options'] = array('active_plugins' => array( 'woocommerce-extension/stacc-recommendation.php' ),);
+	$GLOBALS['wp_tests_options'] = array(
+		'active_plugins' => array( 'woocommerce-extension/stacc-recommendation.php' )
+	);
 	}
 	
 	/**
