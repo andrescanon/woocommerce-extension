@@ -22,5 +22,8 @@ before_script:
     - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
     - sed -i "s/yourpasswordhere//" wp-tests-config.php
     #- cd "/tmp/wordpress/wp-content/plugins/$PLUGIN_SLUG"
+    - npm install -g grunt-cli
+    - npm install
+    - grunt build
     
 script: phpunit
