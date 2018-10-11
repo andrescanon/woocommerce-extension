@@ -3,14 +3,13 @@
 /**
  * The admin-specific functionality of the plugin.
  *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
+ * Defines the plugin name, version, and two callbacks for creating the options page
  *
  * @since      0.1.0
  * @package    Recommendations
- * @subpackage Recommendations/includes
+ * @subpackage Recommendations/admin
  * @author     Lauri Leiten <leitenlauri@gmail.com>
- * @author       Stiivo Siider <stiivosiider@gmail.com>
+ * @author     Stiivo Siider <stiivosiider@gmail.com>
  */
 
 class Recommender_Admin
@@ -53,7 +52,6 @@ class Recommender_Admin
      * Registers the options for the menu
      *
      * @since      0.1.0
-     * @access     widget
      */
     public function admin_init()
     {
@@ -62,11 +60,9 @@ class Recommender_Admin
     }
 
     /**
-     * Registers the menu for the admin area
      * Adds the menu under the WooCommerce settings panel
      *
      * @since      0.1.0
-     * @access     widget
      */
     public function admin_menu()
     {
@@ -84,7 +80,6 @@ class Recommender_Admin
      * Creates the page for options page
      *
      * @since      0.1.0
-     * @access     widget
      */
     public function admin_recommender_main()
     {

@@ -11,13 +11,13 @@
 /**
  * The core plugin class.
  *
- * This is used to define admin-specific hooks
+ * This is used to define admin-specific and event catcher hooks and filters
  *
  * @since      0.1.0
  * @package    Recommendations
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
- * @author       Stiivo Siider <stiivosiider@gmail.com>
+ * @author     Stiivo Siider <stiivosiider@gmail.com>
  */
 class Recommender
 {
@@ -54,7 +54,7 @@ class Recommender
      * Define the core functionality of the plugin.
      *
      * Set the plugin name and the plugin version that can be used throughout the plugin.
-     * Load the dependencies and set the hooks for the admin area
+     * Load the dependencies and set the hooks and filters for event catching and the admin area
      *
      * @since    0.1.0
      */
@@ -79,6 +79,7 @@ class Recommender
      *
      * - Recommender_Loader. Orchestrates the hooks of the plugin.
      * - Recommender_Admin. Defines all hooks for the admin area.
+     * - Event_Catcher. Defines all hooks and filter for event catching
      *
      * Create an instance of the loader which will be used to register the hooks
      * with WordPress.
