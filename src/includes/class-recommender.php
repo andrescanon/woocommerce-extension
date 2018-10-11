@@ -18,6 +18,7 @@
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  * @author     Stiivo Siider <stiivosiider@gmail.com>
+ * @author     Martin Jürgel <martin457345@gmail.com>
  */
 class Recommender
 {
@@ -69,6 +70,7 @@ class Recommender
 
         $this->load_dependencies();
         $this->define_admin_hooks();
+        $this->define_event_hooks_filters();
 
     }
 
@@ -79,7 +81,7 @@ class Recommender
      *
      * - Recommender_Loader. Orchestrates the hooks of the plugin.
      * - Recommender_Admin. Defines all hooks for the admin area.
-     * - Event_Catcher. Defines all hooks and filter for event catching
+     * - Event_Catcher. Defines all hooks for catching events.
      *
      * Create an instance of the loader which will be used to register the hooks
      * with WordPress.
@@ -101,6 +103,11 @@ class Recommender
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-recommender-admin.php';
 
+        /**
+         * The class responsible for catching WooCommerce events.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-event-catcher.php';
+
         $this->loader = new Recommender_Loader();
 
     }
@@ -120,6 +127,24 @@ class Recommender
         $this->loader->add_action('admin_menu', $plugin_admin, 'admin_menu');
         $this->loader->add_action('admin_init', $plugin_admin, 'admin_init');
 
+    }
+
+    /**
+     * Register all of the hooks and filters related to the event catching functionality
+     * of the plugin.
+     *
+     * @since    0.1.0
+     * @access   private
+     */
+    private function define_event_hooks_filters()
+    {
+
+        $plugin_catcher = new Event_Catcher($this->get_plugin_name(), $this->get_version());
+
+        $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'action_woocommerce_add_to_cart', 10, 6);
+        $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'action_woocommerce_single_product_summary', 25);
+        $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'action_woocommerce_payment_complete', 10, 1);
+        $this->loader->add_filter('pre_get_posts', $plugin_catcher,'filter_woocommerce_search');
     }
 
     /**
