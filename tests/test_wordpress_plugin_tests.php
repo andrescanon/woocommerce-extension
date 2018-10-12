@@ -6,10 +6,10 @@
  * @package wordpress-plugins-tests
  */
 class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase{
-
-	function setUpBeforeClass()
+  
+	static function setUpBeforeClass()
 	{
-		activate_plugin("woocommerce-3.4.6/woocommerce.php");
+		activate_plugin("woocommerce/woocommerce.php");
 		activate_plugin("woocommerce-extension/stacc-recommendation.php");
 	}
 	

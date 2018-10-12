@@ -10,16 +10,15 @@
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  */
-class Activator
+class Recommender_Activator
 {
-
     /**
      * Runs on activation
      * @since    0.1.0
      */
     public static function activate()
     {
-        if ((!class_exists("WooCommerce"))) {
+	    if ((!is_plugin_active("woocommerce/woocommerce.php"))) {
             deactivate_plugins(plugin_basename(__FILE__));
             die("WooCommerce isn't active");
         }

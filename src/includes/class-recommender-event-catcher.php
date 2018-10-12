@@ -11,7 +11,7 @@
  * @author     Martin Jürgel <martin457345@gmail.com>
  */
 
-class Event_Catcher
+class Recommender_Event_Catcher
 {
 
     /**
@@ -54,7 +54,7 @@ class Event_Catcher
      * @param       WP_Query $query Object containing query data.
      * @return      WP_Query $query Object containing query data.
      */
-    public function filter_woocommerce_search($query)
+    public function woocommerce_search_callback($query)
     {
         if ( $query->is_search )
         {
@@ -75,7 +75,7 @@ class Event_Catcher
      * @param $variation The variation.
      * @param $cart_item_data Cart item data.
      */
-    public function action_woocommerce_add_to_cart( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data )
+    public function woocommerce_add_to_cart_callback( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data )
     {
         error_log("Add to cart, ID: $product_id");
 
@@ -86,7 +86,7 @@ class Event_Catcher
      *
      * @since 0.1.0
      */
-    public function action_woocommerce_single_product_summary()
+    public function woocommerce_single_product_summary_callback()
     {
         global $product;
         $id = $product->get_id();
@@ -99,7 +99,7 @@ class Event_Catcher
      * @since 0.1.0
      * @param $order_id Order ID.
      */
-    public function action_woocommerce_payment_complete( $order_id ) {
+    public function woocommerce_payment_complete_callback( $order_id ) {
         error_log( "Payment complete, order ID: $order_id" );
     }
 }

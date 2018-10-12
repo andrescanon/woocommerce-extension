@@ -26,23 +26,23 @@ define('PLUGIN_NAME_VERSION', '0.1.0');
 /**
  * The code that runs during plugin activation.
  */
-function activate()
+function recommender_activate()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-activator.php';
-    Activator::activate();
+    require_once plugin_dir_path(__FILE__) . 'includes/class-recommender-activator.php';
+	Recommender_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
  */
-function deactivate()
+function recommender_deactivate()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-deactivator.php';
-    Deactivator::deactivate();
+    require_once plugin_dir_path(__FILE__) . 'includes/class-recommender-deactivator.php';
+	Recommender_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate');
-register_deactivation_hook(__FILE__, 'deactivate');
+register_activation_hook(__FILE__, 'recommender_activate');
+register_deactivation_hook(__FILE__, 'recommender_deactivate');
 
 /**
  * The core plugin class that is used to define admin-specific hooks
@@ -60,10 +60,8 @@ require plugin_dir_path(__FILE__) . 'includes/class-recommender.php';
  */
 function run_recommender()
 {
-
     $plugin = new Recommender();
     $plugin->run();
-
 }
 
 run_recommender();

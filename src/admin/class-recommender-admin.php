@@ -49,14 +49,16 @@ class Recommender_Admin
     }
 
     /**
-     * Registers the options for the menu
+     * Registers the options for the menu and checks whether WooCommerce is still active
      *
      * @since      0.1.0
      */
-    public function admin_init()
+    public function recommender_admin_init()
     {
-        register_setting('recommender_options', 'shop_id');
-        register_setting('recommender_options', 'api_key');
+	    if (!is_plugin_active('woocommerce/woocommerce.php'))
+		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
+	    register_setting('recommender_options', 'shop_id');
+	    register_setting('recommender_options', 'api_key');
     }
 
     /**
@@ -64,7 +66,7 @@ class Recommender_Admin
      *
      * @since      0.1.0
      */
-    public function admin_menu()
+    public function recommender_admin_menu()
     {
         add_submenu_page(
             'woocommerce',
@@ -72,7 +74,7 @@ class Recommender_Admin
             'Recommender Options',
             'manage_options',
             'stacc_recommender',
-            array($this, 'admin_recommender_main')
+            array($this, 'recommender_options_page')
         );
     }
 
@@ -81,7 +83,7 @@ class Recommender_Admin
      *
      * @since      0.1.0
      */
-    public function admin_recommender_main()
+    public function recommender_options_page()
     {
         if (!current_user_can('manage_options')) {
             return;
