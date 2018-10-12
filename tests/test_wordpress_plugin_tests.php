@@ -9,6 +9,7 @@ class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase{
 
 	function __construct()
 	{
+		activate_plugin("/tmp/wordpress/build/wp-content/plugins/woocommerce-3.4.6/woocommerce.php");
 		activate_plugin("/tmp/wordpress/build/wp-content/plugins/woocommerce-extension/stacc-recommendation.php");
 	}
 	
