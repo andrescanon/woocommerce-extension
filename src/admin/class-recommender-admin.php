@@ -55,11 +55,10 @@ class Recommender_Admin
      */
     public function recommender_admin_init()
     {
+	    if (!is_plugin_active('woocommerce/woocommerce.php'))
+		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
 	    register_setting('recommender_options', 'shop_id');
 	    register_setting('recommender_options', 'api_key');
-	    if (!is_plugin_active('woocommerce/woocommerce.php')) {
-		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
-	    }
     }
 
     /**
