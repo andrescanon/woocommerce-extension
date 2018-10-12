@@ -71,7 +71,6 @@ class Recommender
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_event_hooks_filters();
-
     }
 
     /**
@@ -106,7 +105,7 @@ class Recommender
         /**
          * The class responsible for catching WooCommerce events.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-event-catcher.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-event-catcher.php';
 
         $this->loader = new Recommender_Loader();
 
@@ -124,9 +123,8 @@ class Recommender
 
         $plugin_admin = new Recommender_Admin($this->get_plugin_name(), $this->get_version());
 
-        $this->loader->add_action('admin_menu', $plugin_admin, 'admin_menu');
-        $this->loader->add_action('admin_init', $plugin_admin, 'admin_init');
-
+        $this->loader->add_action('admin_menu', $plugin_admin, 'recommender_admin_menu');
+        $this->loader->add_action('admin_init', $plugin_admin, 'recommender_admin_init');
     }
 
     /**
@@ -139,12 +137,12 @@ class Recommender
     private function define_event_hooks_filters()
     {
 
-        $plugin_catcher = new Event_Catcher($this->get_plugin_name(), $this->get_version());
+        $plugin_catcher = new Recommender_Event_Catcher($this->get_plugin_name(), $this->get_version());
 
-        $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'action_woocommerce_add_to_cart', 10, 6);
-        $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'action_woocommerce_single_product_summary', 25);
-        $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'action_woocommerce_payment_complete', 10, 1);
-        $this->loader->add_filter('pre_get_posts', $plugin_catcher,'filter_woocommerce_search');
+        $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'woocommerce_add_to_cart_callback', 10, 6);
+        $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'woocommerce_single_product_summary_callback', 25);
+        $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'woocommerce_payment_complete_callback');
+        $this->loader->add_filter('pre_get_posts', $plugin_catcher,'woocommerce_search_callback');
     }
 
     /**

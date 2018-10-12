@@ -10,7 +10,7 @@
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  */
-class Deactivator
+class Recommender_Deactivator
 {
 
     /**
@@ -19,7 +19,6 @@ class Deactivator
      */
     public static function deactivate()
     {
-
     }
 
 }

@@ -19,7 +19,8 @@ before_script:
     - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
     - wget https://github.com/woocommerce/woocommerce/archive/3.4.6.zip
     - unzip 3.4.6.zip -d /tmp/wordpress/build/wp-content/plugins/
-    - cd /tmp/wordpress
+    - mv /tmp/wordpress/build/wp-content/plugins/woocommerce-3.4.6 /tmp/wordpress/build/wp-content/plugins/woocommerce
+    - cd /tmp/wordpress/
     - cp wp-tests-config-sample.php wp-tests-config.php
     - sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
     - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
