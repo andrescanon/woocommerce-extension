@@ -19,7 +19,7 @@ class Activator
      */
     public static function activate()
     {
-        if ((!is_plugin_active("woocommerce/woocommerce.php"))) {
+        if ((!class_exists("WooCommerce"))) {
             deactivate_plugins(plugin_basename(__FILE__));
             die("WooCommerce isn't active");
         }
