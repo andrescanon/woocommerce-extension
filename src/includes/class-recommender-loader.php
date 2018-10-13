@@ -20,7 +20,7 @@
  * @package    Recommendations
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
- * @author       Stiivo Siider <stiivosiider@gmail.com>
+ * @author     Stiivo Siider <stiivosiider@gmail.com>
  */
 class Recommender_Loader
 {
