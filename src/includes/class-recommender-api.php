@@ -8,6 +8,7 @@
  * @package    Recommendations
  * @subpackage Recommendations/includes
  * @author     Lauri Leiten <leitenlauri@gmail.com>
+ * @author     Stiivo Siider <stiivosiider@gmail.com>
  */
 class Recommender_API
 {
@@ -151,5 +152,36 @@ class Recommender_API
 			return false;
 		}
 	}
+
+	public function has_connection(){
+	    try {
+            $url = self::$api_url . '/info';
+
+            $ch = curl_init( $url );
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "Accept: application/json"
+            ));
+            curl_setopt( $ch, CURLOPT_TIMEOUT_MS, 1000 );
+            curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "GET" );
+            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+            curl_exec( $ch );
+
+            if (!curl_errno($ch)){
+                switch ($http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)){
+                    case 200:
+                        return true;
+                    default:
+                        throw new Exception("Unexpected code: " . $http_code);
+                }
+            } else {
+                throw new Exception(curl_error($ch));
+            }
+        }
+        catch (Exception $exception)
+        {
+            //TODO logging
+            return false;
+        }
+    }
 }
 ?>
