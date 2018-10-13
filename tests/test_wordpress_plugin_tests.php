@@ -31,4 +31,26 @@ class WP_Test_WordPress_Plugin_Tests extends WP_UnitTestCase{
 
 	}
 
+    /**
+     * Tests if adding and getting options works.
+     */
+	function test_options(){
+	    $api = "api_key";
+	    $shop = "shop_id";
+        $value = "123";
+
+	    if(!(get_option($api) === false)){
+	        delete_option($api);
+        }
+        if(!(get_option($shop) === false)){
+            delete_option($shop);
+        }
+
+        add_option($api, $value);
+        $this->assertTrue($value === get_option($api));
+
+        add_option($shop, $value);
+        $this->assertTrue($value === get_option($shop));
+    }
+
 }

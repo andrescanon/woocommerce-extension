@@ -70,10 +70,10 @@ class Recommender_Admin
     {
         add_submenu_page(
             'woocommerce',
-            'Recommender Options',
-            'Recommender Options',
+            'STACC',
+            'STACC',
             'manage_options',
-            'stacc_recommender',
+            'recommender_options',
             array($this, 'recommender_options_page')
         );
     }
@@ -95,9 +95,14 @@ class Recommender_Admin
                 <?php
                 settings_fields('recommender_options');
                 // output setting sections and their fields
-                do_settings_sections('stacc_recommender');
+                do_settings_sections('recommender_options');
                 ?>
                 <table class="form-table">
+                    <tr valign="top">
+                        <th scope="row">Recommender Version</th>
+                        <td><?php echo $this->version; ?></td>
+                    </tr>
+
                     <tr valign="top">
                         <th scope="row">Shop ID</th>
                         <td><input type="text" name="shop_id" value="<?php echo esc_attr(get_option('shop_id')); ?>"/>
@@ -112,7 +117,7 @@ class Recommender_Admin
                 </table>
                 <?php
                 // output save settings button
-                submit_button('Save Settings');
+                submit_button('Confirm');
                 ?>
             </form>
         </div>
