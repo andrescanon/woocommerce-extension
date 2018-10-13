@@ -9,7 +9,7 @@
  * Plugin Name:       Recommendations for WooCommerce
  * Plugin URI:        stacc.ee
  * Description:       Displays personalized product recommendations to the user.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Author:            STACC
  * Author URI:        stacc.ee
  */
@@ -21,7 +21,7 @@ if (!defined('WPINC')) {
 /**
  * Current plugin version.
  */
-define('PLUGIN_NAME_VERSION', '0.1.0');
+define('PLUGIN_NAME_VERSION', '0.2.0');
 
 /**
  * The code that runs during plugin activation.
