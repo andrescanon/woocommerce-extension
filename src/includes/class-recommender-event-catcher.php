@@ -68,7 +68,7 @@ class Recommender_Event_Catcher
                 'website' => get_site_url(),
                 'properties' => []
             ];
-            Recommender_API::get_instance()::send_event($data, 'search');
+            Recommender_API::get_instance()->send_event($data, 'search');
         }
         return $query;
     }
@@ -96,7 +96,7 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()::send_event($data, 'add');
+        Recommender_API::get_instance()->send_event($data, 'add');
     }
 
     /**
@@ -120,7 +120,7 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()::send_event($data, 'view');
+        Recommender_API::get_instance()->send_event($data, 'view');
     }
 
     /**
@@ -156,6 +156,6 @@ class Recommender_Event_Catcher
             'currency' => $currency,
             'properties' => []
         ];
-        Recommender_API::get_instance()::send_event($data, 'purchase');
+        Recommender_API::get_instance()->send_event($data, 'purchase');
     }
 }
