@@ -1,5 +1,5 @@
 <?php
-//TEST PUSH v3
+//TEST PUSH v4
 // Forked from https://gist.github.com/1809044
 // Available from https://gist.github.com/nichtich/5290675#file-deploy-php
 $TITLE   = 'Git Deployment Hamster';
@@ -54,6 +54,8 @@ $commands = array(
     'git submodule update',
     'git submodule status',
     'test -e /usr/share/update-notifier/notify-reboot-required && echo "system restart required"',
+    'rm -r /var/www/html/wordpress/wp-content/plguins/src',
+    'cp -r src /var/www/html/wordpress/wp-content/plugins/'
 );
 $output = "\n";
 $log = "####### ".date('Y-m-d H:i:s'). " #######\n";
