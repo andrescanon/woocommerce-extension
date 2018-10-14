@@ -90,10 +90,13 @@ class Recommender_Admin
         }
         if ( isset( $_GET['settings-updated'] ) ) {
             if(!get_settings_errors('errorOnValidation')) {
-                $bool = Recommender_API::get_instance()->has_connection();
-                if ($bool) {
-                    //TODO: Initate async store inventory synchronization here
+                if (Recommender_API::get_instance()->has_connection()) {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
+                    if(Recommender_API::get_instance()->sync_products()){
+                        add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
+                    } else {
+                        add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
+                    }
                 } else {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
                 }

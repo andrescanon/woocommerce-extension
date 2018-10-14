@@ -153,6 +153,12 @@ class Recommender_API
 		}
 	}
 
+    /**
+     * Function to check connection to the API
+     *
+     * @since 0.2.0
+     * @return bool Can the Recommender connect to the API
+     */
 	public function has_connection(){
 	    try {
             $url = self::$api_url . '/info';
@@ -182,6 +188,16 @@ class Recommender_API
             //TODO logging
             return false;
         }
+    }
+
+    /**
+     * Synchronizes the store's products to STACC's servers
+     *
+     * @return bool Is the product sync successful
+     */
+    public function sync_products(){
+	    //TODO: Implement product sync
+	    return true;
     }
 }
 ?>
