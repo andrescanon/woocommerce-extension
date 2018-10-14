@@ -156,7 +156,7 @@ class Recommender_Admin
             add_settings_error(
                 'errorOnValidation',
                 'validationError',
-                'This field must contain only numbers and letters. Must not be empty.',
+                'This field must contain only numbers and letters, and must not be empty.',
                 'error');
         }
     }
