@@ -70,7 +70,7 @@ class Recommender_Admin
     {
         add_submenu_page(
             'woocommerce',
-            'STACC',
+            'STACC Options',
             'STACC',
             'manage_options',
             'recommender_options',
@@ -117,7 +117,7 @@ class Recommender_Admin
                 ?>
                 <table class="form-table">
                     <tr valign="top">
-                        <th scope="row">Recommender Version</th>
+                        <th scope="row">Extension Version</th>
                         <td><?php echo $this->version; ?></td>
                     </tr>
 
