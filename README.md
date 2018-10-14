@@ -13,7 +13,7 @@ A step by step tutorial to get the extesion up and running.
 5. Go to folder /src
 6. Pack everything in that folder to a ZIP file
 7. Make sure the name of the ZIP is woocommerce-extension
-8. Upload the plugin through Wordpress's admin panel plugin install functionality
+8. Upload the new ZIP file through Wordpress's admin panel plugin install functionality
 
 ## Deployment
 
