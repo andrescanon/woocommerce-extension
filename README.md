@@ -1,13 +1,13 @@
 # STACC's WooCommerce extension
 
-STACC's WooCommerce extension that connects STACC's recommendation system with the front end of webstores using WordPress + WooCommerce
+STACC's WooCommerce extension that connects STACC's recommendation system with the front end of webstores using WordPress + WooCommerce  
 [![Build Status](https://travis-ci.com/stacc-dasso/woocommerce-extension.svg?branch=dev)](https://travis-ci.com/stacc-dasso/woocommerce-extension)
 
 ### Installing
 
-A step by step tutorial to get the extesion up and running.
-1. Install Wordpress
-2. Install Woocommerce
+A step by step tutorial to get the extension up and running.
+1. Install WordPress
+2. Install WooCommerce
 3. Download ZIP of this repository
 4. Unzip the file
 5. Go to folder /src
