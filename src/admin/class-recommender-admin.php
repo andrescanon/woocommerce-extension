@@ -57,8 +57,8 @@ class Recommender_Admin
     {
 	    if (!is_plugin_active('woocommerce/woocommerce.php'))
 		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
-	    register_setting('recommender_options', 'shop_id');
-	    register_setting('recommender_options', 'api_key');
+	    register_setting('recommender_options', 'shop_id', array('sanitize_callback'  => array( $this, 'recommender_option_validation' )));
+	    register_setting('recommender_options', 'api_key', array('sanitize_callback'  => array( $this, 'recommender_option_validation' )));
     }
 
     /**
@@ -87,6 +87,20 @@ class Recommender_Admin
     {
         if (!current_user_can('manage_options')) {
             return;
+        }
+        if ( isset( $_GET['settings-updated'] ) ) {
+            if(!get_settings_errors('errorOnValidation')) {
+                $bool = Recommender_API::get_instance()->has_connection();
+                if ($bool) {
+                    add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
+                } else {
+                    add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
+                }
+                add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
+                settings_errors('recommender_messages');
+            } else {
+                settings_errors('errorOnValidation');
+            }
         }
         ?>
         <div class="wrap">
@@ -122,5 +136,24 @@ class Recommender_Admin
             </form>
         </div>
         <?php
+    }
+
+    /**
+     * Function to check if the input consists of only alphanumeric characters
+     *
+     * @param $data Input data that is to be validated
+     * @return mixed Valid data
+     */
+    public function recommender_option_validation($data)
+    {
+        if (ctype_alnum($data)){
+            return sanitize_text_field($data);
+        } else {
+            add_settings_error(
+                'errorOnValidation',
+                'validationError',
+                'This field must contain only numbers and letters. Must not be empty.',
+                'error');
+        }
     }
 }
