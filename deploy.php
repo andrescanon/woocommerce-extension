@@ -53,7 +53,7 @@ $commands = array(
     'git submodule update',
     'git submodule status',
     'test -e /usr/share/update-notifier/notify-reboot-required && echo "system restart required"',
-    'rm -r /var/www/html/wordpress/wp-content/plguins/src',
+    'rm -r /var/www/html/wordpress/wp-content/plugins/src',
     'cp -r src /var/www/html/wordpress/wp-content/plugins/'
 );
 $output = "\n";
