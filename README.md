@@ -1,6 +1,6 @@
 # STACC's WooCommerce extension
+### Connects STACC's recommendation system with the front end of webstores using WordPress + WooCommerce  
 
-STACC's WooCommerce extension that connects STACC's recommendation system with the front end of webstores using WordPress + WooCommerce  
 [![Build Status](https://travis-ci.com/stacc-dasso/woocommerce-extension.svg?branch=dev)](https://travis-ci.com/stacc-dasso/woocommerce-extension)
 
 ### Installing
