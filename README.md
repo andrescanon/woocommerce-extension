@@ -17,7 +17,7 @@ A step by step tutorial to get the extesion up and running.
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Currently it isn't possible to connect to the API without the help of the authors of the plugin
 
 ## Built With
 
