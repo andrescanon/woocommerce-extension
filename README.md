@@ -6,19 +6,14 @@ STACC's WooCommerce extension that connects STACC's recommendation system with t
 ### Installing
 
 A step by step tutorial to get the extesion up and running.
-
------ Will be coming soon, cant be installed yet -----
-
-```
-Instruction 1
-```
-
-Next do this etc.
-
-```
-Instruction 2
-```
-finnally something here
+1. Install Wordpress
+2. Install Woocommerce
+3. Download ZIP of this repository
+4. Unzip the file
+5. Go to folder /src
+6. Pack everything in that folder to a ZIP file
+7. Make sure the name of the ZIP is woocommerce-extension
+8. Upload the plugin through Wordpress's admin panel plugin install functionality
 
 ## Deployment
 
