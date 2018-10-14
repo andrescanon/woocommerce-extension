@@ -1,5 +1,5 @@
 <?php
-//TEST PUSH v5
+//TEST PUSH v6
 // Forked from https://gist.github.com/1809044
 // Available from https://gist.github.com/nichtich/5290675#file-deploy-php
 $TITLE   = 'Git Deployment Hamster';
