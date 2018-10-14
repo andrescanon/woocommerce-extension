@@ -13,7 +13,7 @@ A step by step tutorial to get the extension up and running.
 5. Go to folder /src
 6. Pack everything in that folder to a ZIP file
 7. Make sure the name of the ZIP is woocommerce-extension
-8. Upload the new ZIP file through Wordpress's admin panel plugin install functionality
+8. Upload the new ZIP file through WordPress's admin panel plugin install functionality
 
 ## Deployment
 
@@ -30,6 +30,6 @@ Currently it isn't possible to connect to the API without the help of the author
 ## Authors
 
 * **Lauri Leiten** - *Team lead, Back end* - [Starrimus](https://github.com/Starrimus)
-* **Hannes Saariste** - *Fron end, help with back end* - [ilysion](https://github.com/ilysion)
+* **Hannes Saariste** - *Front end, help with back end* - [ilysion](https://github.com/ilysion)
 * **Stiivo Siider** - *Back end help, testing* - [StiivoSiider](https://github.com/StiivoSiider)
 * **Martin Jürgel** - *Back end help, documentation* - [martin457](https://github.com/martin457)
