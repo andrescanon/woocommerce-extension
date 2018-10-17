@@ -107,6 +107,13 @@ class Recommender_API
 	 */
 	public function send_event($data, $event_type, $timeout = 5000)
 	{
+        //WP internal logging for incoming events. TODO: Once we have tested sending events to the API properly, delete this.
+        // Needs in wp-config.php
+        // define('WP_DEBUG', true);
+        // define('WP_DEBUG_LOG', true);
+        // The log will be in wp-content
+        error_log($event_type);
+        error_log(print_r($data,true));
 		try
 		{
 			// Gets user id and only proceeds if the user is authenticated
