@@ -91,6 +91,70 @@ class Recommender_WC_Logger
 
     }
 
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logEmergency($message){
+        self::get_Logger()->emergency($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logAlert($message){
+        self::get_Logger()->alert($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logCritical($message){
+        self::get_Logger()->critical($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logError($message){
+        self::get_Logger()->error($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logWarning($message){
+        self::get_Logger()->warning($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logNotice($message){
+        self::get_Logger()->notice($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logInformational($message){
+        self::get_Logger()->informational($message, self::get_LogFile());
+    }
+
+    /**
+     * @since      0.3.0
+     * @param      $message string to write in logs
+     */
+    public static function logDebug($message){
+        self::get_Logger()->debug($message, self::get_LogFile());
+    }
+
 
     /**
      * @since      0.3.0

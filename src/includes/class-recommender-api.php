@@ -76,7 +76,7 @@ class Recommender_API
 		self::$key = get_option('api_key');
 
         //if problem:
-        // Recommender_WC_Logger::get_Logger()->error( 'Validation Error', Recommender_WC_Logger::get_LogFile());
+        //Recommender_WC_Logger::logError('Validation Error');
 	}
 
 	/**
@@ -111,6 +111,10 @@ class Recommender_API
 	public function send_event($data, $event_type, $timeout = 5000)
 	{
         //WP internal logging for incoming events. TODO: Once we have tested sending events to the API properly, delete this.
+        // Needs in wp-config.php
+        // define('WP_DEBUG', true);
+        // define('WP_DEBUG_LOG', true);
+        // The log will be in wp-content
         error_log($event_type);
         error_log(print_r($data,true));
 		try
@@ -154,7 +158,7 @@ class Recommender_API
 		}
 		catch (Exception $exception)
 		{
-            Recommender_WC_Logger::get_Logger()->error( 'Event send failed: ' . $exception, Recommender_WC_Logger::get_LogFile());
+		    Recommender_WC_Logger::logError('Event send failed: ' . $exception);
 			return false;
 		}
 	}
@@ -191,7 +195,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            Recommender_WC_Logger::get_Logger()->critical( 'Connection to the API has failed: ' . $exception, Recommender_WC_Logger::get_LogFile());
+            Recommender_WC_Logger::logCritical('Connection to the API has failed: ' . $exception);
             return false;
         }
     }

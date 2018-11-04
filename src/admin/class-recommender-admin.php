@@ -97,18 +97,18 @@ class Recommender_Admin
                         add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
                     } else {
                         add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
-                        Recommender_WC_Logger::get_Logger()->critical( 'Product sync failed', Recommender_WC_Logger::get_LogFile());
+                        Recommender_WC_Logger::logCritical('Product sync failed');
                     }
                 } else {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
-                    Recommender_WC_Logger::get_Logger()->alert( 'API is Offline', Recommender_WC_Logger::get_LogFile());
+                    Recommender_WC_Logger::logAlert('API is Offline');
                 }
                 add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
                 settings_errors('recommender_messages');
-                Recommender_WC_Logger::get_Logger()->informational( 'Settings Saved', Recommender_WC_Logger::get_LogFile());
+                Recommender_WC_Logger::logInformational('Settings Saved');
             } else {
                 settings_errors('errorOnValidation');
-                Recommender_WC_Logger::get_Logger()->notice( 'Validation Error', Recommender_WC_Logger::get_LogFile());
+                Recommender_WC_Logger::logNotice('Validation Error');
             }
         }
         ?>
