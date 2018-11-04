@@ -29,4 +29,8 @@ before_script:
     - npm install
     - grunt build
     
-script: phpunit
+script:
+    - phpunit
+
+after_success:
+    - test $TRAVIS_BRANCH = "dev" && echo "On dev branch"

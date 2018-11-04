@@ -20,7 +20,8 @@ EOT;
 // Check whether client is allowed to trigger an update
 $allowed_ips = array(
     '207.97.227.', '50.57.128.', '108.171.174.', '50.57.231.', '204.232.175.', '192.30.252.', '192.30.253', // GitHub
-    '195.37.139.','193.174.' // VZG
+    '195.37.139.','193.174.', // VZG
+    '34.233.', '34.234.', '52.3.', '52.45.', '52.54.', '52.208.', '35.184.', '35.188.', '35.192.', '35.193.', '35.202.', '35.224.', '104.154.', // Travis
 );
 $allowed = false;
 $headers = apache_request_headers();
@@ -37,6 +38,7 @@ foreach ($allowed_ips as $allow) {
     }
 }
 if (!$allowed) {
+    error_log($ip);
     header('HTTP/1.1 403 Forbidden');
     echo "<span style=\"color: #ff0000\">Sorry, no hamster - better convince your parents!</span>\n";
     echo "</pre>\n</body>\n</html>";
