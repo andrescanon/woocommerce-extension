@@ -74,6 +74,9 @@ class Recommender_API
 		//TODO validation, error-handling
 		self::$shop_id = get_option('shop_id');
 		self::$key = get_option('api_key');
+
+        //if problem:
+        // Recommender_WC_Logger::get_Logger()->error( 'Validation Error', Recommender_WC_Logger::get_LogFile());
 	}
 
 	/**
@@ -107,6 +110,9 @@ class Recommender_API
 	 */
 	public function send_event($data, $event_type, $timeout = 5000)
 	{
+        //WP internal logging for incoming events. TODO: Once we have tested sending events to the API properly, delete this.
+        error_log($event_type);
+        error_log(print_r($data,true));
 		try
 		{
 			// Gets user id and only proceeds if the user is authenticated
@@ -148,7 +154,7 @@ class Recommender_API
 		}
 		catch (Exception $exception)
 		{
-			//TODO logging
+            Recommender_WC_Logger::get_Logger()->error( 'Event send failed: ' . $exception, Recommender_WC_Logger::get_LogFile());
 			return false;
 		}
 	}
@@ -185,7 +191,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            //TODO logging
+            Recommender_WC_Logger::get_Logger()->critical( 'Connection to the API has failed: ' . $exception, Recommender_WC_Logger::get_LogFile());
             return false;
         }
     }

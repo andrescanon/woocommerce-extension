@@ -108,6 +108,11 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-api.php';
 
         /**
+         * The class responsible for logging.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-logger.php';
+
+        /**
          * The class responsible for catching WooCommerce events.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-event-catcher.php';
