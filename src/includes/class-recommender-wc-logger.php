@@ -144,7 +144,7 @@ class Recommender_WC_Logger
      * @param      $message string to write in logs
      */
     public static function logInformational($message){
-        self::get_Logger()->informational($message, self::get_LogFile());
+        self::get_Logger()->info($message, self::get_LogFile());
     }
 
     /**
