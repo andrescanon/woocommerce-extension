@@ -29,4 +29,8 @@ before_script:
     - npm install
     - grunt build
     
-script: phpunit
+script:
+    - phpunit
+
+after_success:
+    - test $TRAVIS_BRANCH = "dev" && wget -qO /dev/null $DEMO_DEPLOY_URL  > /dev/null 2>&1

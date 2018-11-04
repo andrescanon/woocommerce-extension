@@ -201,13 +201,52 @@ class Recommender_API
     }
 
     /**
-     * Synchronizes the store's products to STACC's servers
+     * Sends events to the API
      *
-     * @return bool Is the product sync successful
+     * @since      0.3.0
+     * @param      ArrayObject $data data to be sent to the API
+     * @param      int $timeout Default value 5000
+     * @return     bool $status true if everything went well; false otherwise
      */
-    public function sync_products(){
-	    //TODO: Implement product sync
-	    return true;
+    public function catalog_sync($data, $timeout = 5000)
+    {
+        error_log("Start catalog sync");
+        error_log(print_r($data,true));
+        try
+        {
+            // Gets user id and only proceeds if the user is authenticated
+            $user_id = get_current_user_id();
+            if ($user_id == 0)
+                throw new Exception("user isn't logged in");
+            // Concatenates the API URL and endpoint path
+            $url = self::$api_url . "/catalog_sync";
+            //TODO data validation
+            // Sends the data to the API
+            $data_string = json_encode( $data );
+            error_log(print_r($data_string,true));
+            $ch = curl_init( $url );
+            curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen( $data_string )
+                )
+            );
+            curl_setopt( $ch, CURLOPT_USERPWD, self::$shop_id . ":" . self::$key );
+            curl_setopt( $ch, CURLOPT_FRESH_CONNECT, 1 );
+            curl_setopt( $ch, CURLOPT_TIMEOUT_MS, $timeout );
+            curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
+            curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
+            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+            $result = json_decode ( curl_exec( $ch ) );
+            if ($result != null)
+                throw new Exception($result['error']);
+            return true;
+        }
+        catch (Exception $exception)
+        {
+            //TODO logging
+            return false;
+        }
     }
+
 }
 ?>

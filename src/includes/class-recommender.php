@@ -117,6 +117,12 @@ class Recommender
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-event-catcher.php';
 
+        /**
+         * The class responsible for syncing the stores catalog.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
+
+
         $this->loader = new Recommender_Loader();
 
     }
