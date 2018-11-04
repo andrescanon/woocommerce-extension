@@ -37,8 +37,11 @@ foreach ($allowed_ips as $allow) {
         break;
     }
 }
+$log = "####### ".date('Y-m-d H:i:s'). " #######\n";
 if (!$allowed) {
-    error_log($ip);
+    $log  .= "\$ 'whoami' \n".shell_exec("whoami 2>&1")."\n";
+    $log  .= "\$ $ip \n"."Forbidden access"."\n";
+    file_put_contents ('deploy-log.txt',$log,FILE_APPEND);
     header('HTTP/1.1 403 Forbidden');
     echo "<span style=\"color: #ff0000\">Sorry, no hamster - better convince your parents!</span>\n";
     echo "</pre>\n</body>\n</html>";
@@ -59,7 +62,6 @@ $commands = array(
     'cp -r src /var/www/html/wordpress/wp-content/plugins/'
 );
 $output = "\n";
-$log = "####### ".date('Y-m-d H:i:s'). " #######\n";
 foreach($commands AS $command){
     // Run it
     $tmp = shell_exec("$command 2>&1");
