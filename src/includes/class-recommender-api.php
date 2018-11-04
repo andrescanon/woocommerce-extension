@@ -74,6 +74,9 @@ class Recommender_API
 		//TODO validation, error-handling
 		self::$shop_id = get_option('shop_id');
 		self::$key = get_option('api_key');
+
+        //if problem:
+        //Recommender_WC_Logger::logError('Validation Error');
 	}
 
 	/**
@@ -155,7 +158,7 @@ class Recommender_API
 		}
 		catch (Exception $exception)
 		{
-			//TODO logging
+		    Recommender_WC_Logger::logError('Event send failed: ' . $exception);
 			return false;
 		}
 	}
@@ -192,7 +195,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            //TODO logging
+            Recommender_WC_Logger::logCritical('Connection to the API has failed: ' . $exception);
             return false;
         }
     }
