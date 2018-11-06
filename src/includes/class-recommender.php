@@ -92,6 +92,22 @@ class Recommender
     {
 
         /**
+         * Loads log handler interface
+         */
+        require_once plugin_dir_path(dirname(WP_CONTENT_DIR)) . 'wordpress/wp-content/plugins/woocommerce/includes/interfaces/class-wc-log-handler-interface.php';
+
+        /**
+         * Loads log handler
+         */
+        require_once plugin_dir_path(dirname(WP_CONTENT_DIR)) . 'wordpress/wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-log-handler.php';
+
+        /**
+         * Loads log handler file so it can be extended
+         */
+        require_once plugin_dir_path(dirname(WP_CONTENT_DIR)) . 'wordpress/wp-content/plugins/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
+
+
+        /**
          * The class responsible for orchestrating the actions and filters of the
          * core plugin.
          */
@@ -113,6 +129,11 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-logger.php';
 
         /**
+         * Log handler for logging.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-handler.php';
+
+        /**
          * The class responsible for catching WooCommerce events.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-event-catcher.php';
@@ -121,6 +142,7 @@ class Recommender
          * The class responsible for syncing the stores catalog.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
+
 
 
         $this->loader = new Recommender_Loader();

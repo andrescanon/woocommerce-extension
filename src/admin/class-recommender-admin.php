@@ -85,6 +85,14 @@ class Recommender_Admin
      */
     public function recommender_options_page()
     {
+        //juts for testing logging atm:
+        Recommender_WC_Log_Handler::logCritical('testMessage1');
+        Recommender_WC_Log_Handler::set_Sent_And_Empty_Output_File();
+        Recommender_WC_Log_Handler::logAlert('testMessage2');
+        Recommender_WC_Log_Handler::logDebug('testMessage3');
+
+        //-----------
+
 
         if (!current_user_can('manage_options')) {
             return;
