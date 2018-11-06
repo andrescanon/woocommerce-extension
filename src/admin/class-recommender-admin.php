@@ -121,18 +121,30 @@ class Recommender_Admin
             if(!get_settings_errors('errorOnValidation')) {
                 if (Recommender_API::get_instance()->has_connection()) {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
-                    if(Recommender_API::get_instance()->sync_products()){
+                    if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
                         add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
                     } else {
                         add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
+                        Recommender_WC_Logger::logCritical('Product sync failed');
                     }
                 } else {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
+                    Recommender_WC_Logger::logAlert('API is Offline');
+                    # TODO; Remove in live environment, currently here for testing purpsoses
+                    if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
+                        add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
+                    } else {
+                        add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
+                        Recommender_WC_Logger::logCritical('Product sync failed');
+                    }
+                    # END;
                 }
                 add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
                 settings_errors('recommender_messages');
+                Recommender_WC_Logger::logInformational('Settings Saved');
             } else {
                 settings_errors('errorOnValidation');
+                Recommender_WC_Logger::logNotice('Validation Error');
             }
         }
 
