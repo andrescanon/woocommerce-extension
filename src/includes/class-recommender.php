@@ -159,6 +159,18 @@ class Recommender
         $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'woocommerce_single_product_summary_callback', 25);
         $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'woocommerce_payment_complete_callback');
         $this->loader->add_filter('pre_get_posts', $plugin_catcher,'woocommerce_search_callback');
+
+        $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
+            "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
+            "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"
+        );
+
+        foreach ($options as $option) {
+            if (get_option($option) != false)
+            {
+                $this->loader->add_action($option, $plugin_catcher, 'woocommerce_output_related_products', get_option($option));
+            }
+        }
     }
 
     /**

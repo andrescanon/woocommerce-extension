@@ -59,6 +59,15 @@ class Recommender_Admin
 		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
 	    register_setting('recommender_options', 'shop_id', array('sanitize_callback'  => array( $this, 'recommender_option_validation' )));
 	    register_setting('recommender_options', 'api_key', array('sanitize_callback'  => array( $this, 'recommender_option_validation' )));
+        register_setting('box_options', 'woocommerce_before_single_product_summary');
+        register_setting('box_options', 'woocommerce_after_single_product_summary');
+        register_setting('box_options', 'woocommerce_before_shop_loop');
+        register_setting('box_options', 'woocommerce_after_shop_loop');
+        register_setting('box_options', 'woocommerce_before_cart');
+        register_setting('box_options', 'woocommerce_after_cart_table');
+        register_setting('box_options', 'woocommerce_after_cart_totals');
+        register_setting('box_options', 'woocommerce_after_cart');
+        register_setting('box_options', 'disable_default_box');
     }
 
     /**
@@ -79,49 +88,61 @@ class Recommender_Admin
     }
 
     /**
-     * Creates the page for options page
+     * Redirects the user to the appropriate page in the admin panel based on the tab that's currently active.
      *
-     * @since      0.1.0
+     * @since      0.3.0
      */
     public function recommender_options_page()
     {
-
         if (!current_user_can('manage_options')) {
             return;
         }
+
+        $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'connect_to_api';
+
+        if( $active_tab == 'connect_to_api' )
+            $this->api_auth_page();
+        else
+            $this->box_preferences_page();
+    }
+
+    /**
+     * Creates the page for API auth settings
+     *
+     * @since      0.1.0
+     */
+    public function api_auth_page()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
         if ( isset( $_GET['settings-updated'] ) ) {
             if(!get_settings_errors('errorOnValidation')) {
                 if (Recommender_API::get_instance()->has_connection()) {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
-                    if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
+                    if(Recommender_API::get_instance()->sync_products()){
                         add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
                     } else {
                         add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
-                        Recommender_WC_Logger::logCritical('Product sync failed');
                     }
                 } else {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
-                    Recommender_WC_Logger::logAlert('API is Offline');
-                    # TODO; Remove in live environment, currently here for testing purpsoses
-                    if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
-                        add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
-                    } else {
-                        add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
-                        Recommender_WC_Logger::logCritical('Product sync failed');
-                    }
-                    # END;
                 }
                 add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
                 settings_errors('recommender_messages');
-                Recommender_WC_Logger::logInformational('Settings Saved');
             } else {
                 settings_errors('errorOnValidation');
-                Recommender_WC_Logger::logNotice('Validation Error');
             }
         }
+
         ?>
         <div class="wrap">
             <h1><?= esc_html(get_admin_page_title()); ?></h1>
+            <h2 class="nav-tab-wrapper">
+                <a href="?page=recommender_options&tab=connect_to_api" class="nav-tab">Connect to the API</a>
+                <a href="?page=recommender_options&tab=box_preferences" class="nav-tab">Box Preferences</a>
+            </h2>
             <form action="options.php" method="post">
                 <?php
                 settings_fields('recommender_options');
@@ -145,6 +166,90 @@ class Recommender_Admin
                         <td><input type="text" name="api_key" value="<?php echo esc_attr(get_option('api_key')); ?>"/>
                         </td>
                     </tr>
+                </table>
+                <?php
+                // output save settings button
+                submit_button('Confirm');
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * Creates the page for recommender box preferences.
+     *
+     * @since      0.3.0
+     */
+    public function box_preferences_page()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        if ( isset( $_GET['settings-updated'] ) ) {
+            add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
+            settings_errors('recommender_messages');
+        }
+        ?>
+        <div class="wrap">
+            <h1><?= esc_html(get_admin_page_title()); ?></h1>
+            <h2 class="nav-tab-wrapper">
+                <a href="?page=recommender_options&tab=connect_to_api" class="nav-tab">Connect to the API</a>
+                <a href="?page=recommender_options&tab=box_preferences" class="nav-tab">Box Preferences</a>
+            </h2>
+            <form action="options.php" method="post">
+                <?php
+                settings_fields('box_options');
+                // output setting sections and their fields
+                do_settings_sections('box_options');
+                ?>
+                <table class="form-table">
+                    <tr valign="top">
+                        <th scope="row">Extension Version</th>
+                        <td><?php echo $this->version; ?></td>
+                        <th scope="row">Disable default box</th>
+                        <td><input type="checkbox" name="disable_default_box" value="1" <?php checked( 1 == get_option( 'disable_default_box' ) ); ?>"/></td>
+                    </tr>
+                    <tr valign="center">
+                        <th scope="row" style="font-size: large">Single product view</th>
+                        <th scope="row"></th>
+                        <th scope="row" style="font-size: large">Multiple product view</th>
+                        <th scope="row"></th>
+                        <th scope="row" style="font-size: large">Shopping cart</th>
+                        <th scope="row"></th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">Before product summary</th>
+                        <td><input type="checkbox" name="woocommerce_before_single_product_summary" value="10" <?php checked( 10 == get_option( 'woocommerce_before_single_product_summary' ) ); ?>"/></td>
+                        <th scope="row">Before products</th>
+                        <td><input type="checkbox" name="woocommerce_before_shop_loop" value="20" <?php checked( 20 == get_option( 'woocommerce_before_shop_loop' ) ); ?>"/></td>
+                        <th scope="row">Before cart</th>
+                        <td><input type="checkbox" name="woocommerce_before_cart" value="10" <?php checked( 10 == get_option( 'woocommerce_before_cart' ) ); ?>"/></td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">After product summary</th>
+                        <td><input type="checkbox" name="woocommerce_after_single_product_summary" value="25" <?php checked( 25 == get_option( 'woocommerce_after_single_product_summary' ) ); ?>"/></td>
+                        <th scope="row">After products</th>
+                        <td><input type="checkbox" name="woocommerce_after_shop_loop" value="10" <?php checked( 10 == get_option( 'woocommerce_after_shop_loop' ) ); ?>"/></td>
+                        <th scope="row">After cart table</th>
+                        <td><input type="checkbox" name="woocommerce_after_cart_table" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart_table' ) ); ?>"/></td>
+                    </tr>
+                    <tr valign="top">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <th scope="row">After cart totals</th>
+                        <td><input type="checkbox" name="woocommerce_after_cart_totals" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart_totals' ) ); ?>"/></td>
+                    </tr>
+                    <tr valign="top">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <th scope="row">After cart</th>
+                        <td><input type="checkbox" name="woocommerce_after_cart" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart' ) ); ?>"/></td>
                 </table>
                 <?php
                 // output save settings button
