@@ -21,20 +21,32 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     private static $output_File = null;
 
+    protected static $version = null;
+
 
     public static function set_Output_File($str){
         self::$output_File = $str;
     }
 
     public static function set_Sent_And_Empty_Output_File(){
-        copy(plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '.log',
-            plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . 'sent.log');
+        if(copy(plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '.log',
+            plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '_sent.log')){
+            self::logNotice("Making copy of log file to " . self::$output_File . '_sent.log succeeded');
 
-        //TODO unlink isnt working right now, checked file is writeable and exists, ???
-        unlink(plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '.log');
+            if(self::get_instance()->remove(self::$output_File)){
+                self::logNotice("Old log file successfully deleted");
+            }
+            else{
+                self::logWarning("Old log file was not deleted!");
+            }
+        }
+        else{
+            self:self::logWarning("Making copy of old log file failed!");
+        }
+
     }
 
-    public function __construct( $log_size_limit = null ) {
+    public function __construct($version , $log_size_limit = null) {
 
         if ( null === $log_size_limit ) {
             $log_size_limit = 5 * 1024 * 1024;
@@ -42,6 +54,8 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
         $this->log_size_limit = $log_size_limit;
         self::$output_File = 'StaccDefault';
+        self::$version = $version;
+        self::$instance = $this;
 
         add_action( 'plugins_loaded', array( $this, 'write_cached_logs' ) );
     }
@@ -53,8 +67,6 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     public static function get_instance()
     {
-        if (self::$instance == null)
-            self::$instance = new Recommender_WC_Log_Handler();
         return self::$instance;
     }
 
@@ -62,12 +74,11 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     private function addTo( $level, $message) {
 
         $entry = json_encode([
-            //"channel" => $channel,
+            "channel" => "WOOCOMMERCE_EXTENSION",
             "level" => $level,
             "msg" => $message,
             "timestamp" => date_i18n( 'm-d-Y @ H:i:s' ),
-            //TODO getting version, not working like that:
-            //"extension_version" => Recommender::get_version()
+            "extension_version" => self::$version
         ]);
 
         return $this->add( $entry, self::$output_File);

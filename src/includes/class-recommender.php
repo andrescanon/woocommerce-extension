@@ -19,6 +19,7 @@
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  * @author     Stiivo Siider <stiivosiider@gmail.com>
  * @author     Martin Jürgel <martin457345@gmail.com>
+ * @author     Hannes Saariste <hannes.saariste@gmail.com>
  */
 class Recommender
 {
@@ -71,6 +72,7 @@ class Recommender
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_event_hooks_filters();
+        $this->define_Log_Handler();
     }
 
     /**
@@ -124,11 +126,6 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-api.php';
 
         /**
-         * The class responsible for logging.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-logger.php';
-
-        /**
          * Log handler for logging.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-handler.php';
@@ -147,6 +144,16 @@ class Recommender
 
         $this->loader = new Recommender_Loader();
 
+    }
+
+    /**
+     * instance Recommender_WC_Log_Handler
+     *
+     * @since    0.3.0
+     * @access   private
+     */
+    private function define_Log_Handler(){
+        new Recommender_WC_Log_Handler($this->get_version());
     }
 
     /**
