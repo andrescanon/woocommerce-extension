@@ -96,17 +96,17 @@ class Recommender
         /**
          * Loads log handler interface
          */
-        require_once plugin_dir_path(dirname(WP_CONTENT_DIR)) . 'wordpress/wp-content/plugins/woocommerce/includes/interfaces/class-wc-log-handler-interface.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . '../' . 'woocommerce/includes/interfaces/class-wc-log-handler-interface.php';
 
         /**
          * Loads log handler
          */
-        require_once plugin_dir_path(dirname(WP_CONTENT_DIR)) . 'wordpress/wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-log-handler.php';
-
+        require_once plugin_dir_path(dirname(__FILE__)) . '../' . 'woocommerce/includes/abstracts/abstract-wc-log-handler.php';
+        
         /**
          * Loads log handler file so it can be extended
          */
-        require_once plugin_dir_path(dirname(WP_CONTENT_DIR)) . 'wordpress/wp-content/plugins/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . '../' . 'woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
 
 
         /**
