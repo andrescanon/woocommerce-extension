@@ -52,8 +52,8 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      * @access     public
      */
     public static function set_Sent_And_Empty_Output_File(){
-        if(copy(plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '.log',
-            plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '_sent.log')){
+        if(copy(WP_CONTENT_DIR . '/uploads/wc-logs/' . self::$output_File . '.log',
+            WP_CONTENT_DIR . '/uploads/wc-logs/' . self::$output_File . '_sent.log')){
             self::logNotice("Making copy of log file to " . self::$output_File . '_sent.log succeeded');
 
             if(self::get_instance()->remove(self::$output_File)){
@@ -64,7 +64,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
             }
         }
         else{
-            self:self::logWarning("Making copy of old log file failed!");
+            self::logWarning("Making copy of old log file failed!");
         }
 
     }
