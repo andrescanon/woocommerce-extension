@@ -76,7 +76,7 @@ class Recommender_API
 		self::$key = get_option('api_key');
 
         //if problem:
-        //Recommender_WC_Logger::logError('Validation Error');
+        //Recommender_WC_Log_Handler::logError('Validation Error');
 	}
 
 	/**
@@ -158,7 +158,7 @@ class Recommender_API
 		}
 		catch (Exception $exception)
 		{
-		    Recommender_WC_Logger::logError('Event send failed: ' . $exception);
+            Recommender_WC_Log_Handler::logError('Event send failed: ' . $exception);
 			return false;
 		}
 	}
@@ -195,7 +195,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            Recommender_WC_Logger::logCritical('Connection to the API has failed: ' . $exception);
+            Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ' . $exception);
             return false;
         }
     }

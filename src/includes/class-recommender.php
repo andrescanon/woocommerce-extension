@@ -19,6 +19,7 @@
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  * @author     Stiivo Siider <stiivosiider@gmail.com>
  * @author     Martin Jürgel <martin457345@gmail.com>
+ * @author     Hannes Saariste <hannes.saariste@gmail.com>
  */
 class Recommender
 {
@@ -71,6 +72,7 @@ class Recommender
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_event_hooks_filters();
+        $this->define_Log_Handler();
     }
 
     /**
@@ -92,6 +94,23 @@ class Recommender
     {
 
         /**
+         * Loads log handler interface
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/interfaces/class-wc-log-handler-interface.php' ;
+
+        /**
+         * Loads log handler
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/abstracts/abstract-wc-log-handler.php' ;
+
+        /**
+         * Loads log handler file so it can be extended
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
+
+
+
+        /**
          * The class responsible for orchestrating the actions and filters of the
          * core plugin.
          */
@@ -108,9 +127,9 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-api.php';
 
         /**
-         * The class responsible for logging.
+         * Log handler for logging.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-logger.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-handler.php';
 
         /**
          * The class responsible for catching WooCommerce events.
@@ -123,8 +142,19 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
 
 
+
         $this->loader = new Recommender_Loader();
 
+    }
+
+    /**
+     * instance Recommender_WC_Log_Handler
+     *
+     * @since    0.3.0
+     * @access   private
+     */
+    private function define_Log_Handler(){
+        new Recommender_WC_Log_Handler($this->get_version());
     }
 
     /**
