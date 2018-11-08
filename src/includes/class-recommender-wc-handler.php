@@ -12,22 +12,45 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * An instance of this class
-     *
      * @since      0.3.0
      * @access     private
      * @var        Recommender_WC_Log_Handler $instance An instance of this class
      */
     private static $instance = null;
 
+    /**
+     * @since      0.3.0
+     * @access     private
+     * @var        $output_File string output file for logging
+     */
     private static $output_File = null;
 
+    /**
+     * An instance of this class
+     * @since      0.3.0
+     * @access     protected
+     * @var        $version string used for storing plugin version
+     */
     protected static $version = null;
 
-
+    /**
+     * Sets the output file
+     *
+     * @since      0.3.0
+     * @access     public
+     * @param      $str string filename of the new output file
+     */
     public static function set_Output_File($str){
         self::$output_File = $str;
     }
 
+    /**
+     * Method used for making a copy of old log file to 'filename' . sent.log
+     * Then deletes the old log file
+     *
+     * @since      0.3.0
+     * @access     public
+     */
     public static function set_Sent_And_Empty_Output_File(){
         if(copy(plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '.log',
             plugin_dir_path(dirname(WP_CONTENT_DIR)). 'wordpress/wp-content/uploads/wc-logs/' . self::$output_File . '_sent.log')){
@@ -46,6 +69,13 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     }
 
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since      0.3.0
+     * @access     public
+     * @param      $version string plugin version
+     */
     public function __construct($version , $log_size_limit = null) {
 
         if ( null === $log_size_limit ) {
@@ -62,22 +92,31 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
-     * @return     Recommender_WC_Log_Handler
+     * @access     public
+     * @return     Recommender_WC_Log_Handler instance
      */
-
     public static function get_instance()
     {
         return self::$instance;
     }
 
-
-    private function addTo( $level, $message) {
+    /**
+     * @since      0.3.0
+     * @access     private
+     * @param      $level string Log message level
+     * @param      $message string Log message
+     * @param      array $context context array
+     * @return     bool if logging was successful
+     *
+     */
+    private function addTo( $level, $message, $context = array()) {
 
         $entry = json_encode([
             "channel" => "WOOCOMMERCE_EXTENSION",
             "level" => $level,
             "msg" => $message,
             "timestamp" => date_i18n( 'm-d-Y @ H:i:s' ),
+            "context" => $context,
             "extension_version" => self::$version
         ]);
 
@@ -88,6 +127,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logEmergency($message){
@@ -96,6 +136,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logAlert($message){
@@ -104,6 +145,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logCritical($message){
@@ -112,6 +154,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logError($message){
@@ -120,6 +163,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logWarning($message){
@@ -128,6 +172,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logNotice($message){
@@ -136,6 +181,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logInformational($message){
@@ -144,6 +190,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
 
     /**
      * @since      0.3.0
+     * @access     public
      * @param      $message string to write in logs
      */
     public static function logDebug($message){
@@ -154,9 +201,10 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     /**
      * Get a log file name.
      *
-     * @since 3.3
-     * @param string $handle Log name.
-     * @return bool|string The log file name or false if cannot be determined.
+     * @since      0.3.0
+     * @access     public
+     * @param      string $handle Log name.
+     * @return     bool|string The log file name or false if cannot be determined.
      */
     public static function get_log_file_name( $handle ) {
         if ( function_exists( 'wp_hash' ) ) {
