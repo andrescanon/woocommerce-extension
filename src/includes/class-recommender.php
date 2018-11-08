@@ -72,7 +72,7 @@ class Recommender
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_event_hooks_filters();
-        $this->define_Log_Handler();
+        $this->define_instances();
     }
 
     /**
@@ -107,8 +107,6 @@ class Recommender
          * Loads log handler file so it can be extended
          */
         require_once WP_PLUGIN_DIR . '/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
-
-
 
         /**
          * The class responsible for orchestrating the actions and filters of the
@@ -148,12 +146,13 @@ class Recommender
     }
 
     /**
+     * Define internal instances of classes
      * instance Recommender_WC_Log_Handler
      *
      * @since    0.3.0
      * @access   private
      */
-    private function define_Log_Handler(){
+    private function define_instances(){
         new Recommender_WC_Log_Handler($this->get_version());
     }
 

@@ -40,7 +40,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      * @access     public
      * @param      $str string filename of the new output file
      */
-    public static function set_Output_File($str){
+    public static function set_output_file($str){
         self::$output_File = $str;
     }
 
@@ -51,7 +51,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      * @since      0.3.0
      * @access     public
      */
-    public static function set_Sent_And_Empty_Output_File(){
+    public static function set_sent_and_empty_output_file(){
         if(copy(WP_CONTENT_DIR . '/uploads/wc-logs/' . self::$output_File . '.log',
             WP_CONTENT_DIR . '/uploads/wc-logs/' . self::$output_File . '_sent.log')){
             self::logNotice("Making copy of log file to " . self::$output_File . '_sent.log succeeded');

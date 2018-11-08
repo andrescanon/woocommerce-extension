@@ -158,7 +158,7 @@ class Recommender_API
 		}
 		catch (Exception $exception)
 		{
-            Recommender_WC_Log_Handler::logError('Event send failed: ' . $exception);
+            Recommender_WC_Log_Handler::logError('Event send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
 			return false;
 		}
 	}
@@ -195,7 +195,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ' . $exception);
+            Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return false;
         }
     }
@@ -243,7 +243,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            //TODO logging
+            Recommender_WC_Log_Handler::logError('Catalog sync failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return false;
         }
     }
