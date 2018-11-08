@@ -120,6 +120,9 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
+        if (get_option('disable_default_box') == 1)
+            remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
         Recommender_API::get_instance()->send_event($data, 'view');
     }
 
@@ -157,5 +160,28 @@ class Recommender_Event_Catcher
             'properties' => []
         ];
         Recommender_API::get_instance()->send_event($data, 'purchase');
+    }
+
+    /**
+     * Callback for outputting related products.
+     *
+     * @since 0.3.0
+     */
+    function woocommerce_output_related_products(){
+        global $product;
+
+        /*
+         * Just a temporary solution for testing purposes. If no product available to get related products to,
+         * get products related to product ID 15.
+         */
+        if ( ! $product ) {
+            $product = wc_get_product('15');
+        }
+        $args = array(
+            'posts_per_page' => 1,
+            'columns' => 1,
+            'orderby' => 'rand'
+        );
+        woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
     }
 }
