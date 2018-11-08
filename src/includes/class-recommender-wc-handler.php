@@ -109,7 +109,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      * @return     bool if logging was successful
      *
      */
-    private function addTo( $level, $message, $context = array()) {
+    private function addTo( $level, $message, $context) {
 
         $entry = json_encode([
             "channel" => "WOOCOMMERCE_EXTENSION",
@@ -129,72 +129,80 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logEmergency($message){
-        self::get_instance()->addTo('Emergency', $message);
+    public static function logEmergency($message, $context = array()){
+        self::get_instance()->addTo('Emergency', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logAlert($message){
-        self::get_instance()->addTo('Alert', $message);
+    public static function logAlert($message, $context = array()){
+        self::get_instance()->addTo('Alert', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logCritical($message){
-        self::get_instance()->addTo('Critical', $message);
+    public static function logCritical($message, $context = array()){
+        self::get_instance()->addTo('Critical', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logError($message){
-        self::get_instance()->addTo('Error', $message);
+    public static function logError($message, $context = array()){
+        self::get_instance()->addTo('Error', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logWarning($message){
-        self::get_instance()->addTo('Warning', $message);
+    public static function logWarning($message, $context = array()){
+        self::get_instance()->addTo('Warning', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logNotice($message){
-        self::get_instance()->addTo('Notice', $message);
+    public static function logNotice($message, $context = array()){
+        self::get_instance()->addTo('Notice', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logInformational($message){
-        self::get_instance()->addTo('Informational', $message);
+    public static function logInformational($message, $context = array()){
+        self::get_instance()->addTo('Informational', $message, $context);
     }
 
     /**
      * @since      0.3.0
      * @access     public
      * @param      $message string to write in logs
+     * @param      array $context
      */
-    public static function logDebug($message){
-        self::get_instance()->addTo('Debug', $message);
+    public static function logDebug($message, $context = array()){
+        self::get_instance()->addTo('Debug', $message, $context);
     }
 
 
