@@ -47,7 +47,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API URL
 	 */
-	private static $api_url = 'TODO';
+	private static $api_url = 'http://127.0.0.1:5678/';
 
 	/**
 	 * API endpoints
@@ -61,6 +61,21 @@ class Recommender_API
 		'purchase' => '/send_purchase',
 		'view' => '/send_view',
 		'search' => '/send_search'
+	];
+
+	/**
+	 * Needed fields for endpoints
+	 *
+	 * @since      0.3.0
+	 * @access     private
+	 * @var        ArrayObject $fields JSON field information
+	 */
+	private static $fields = [
+		'add' => ["item_id", "stacc_id", "website", "properties"],
+		'purchase' => ["stacc_id", "item_list", "website", "currency", "properties"],
+		'view' => ["item_id", "stacc_id", "website", "properties"],
+		'search' => ["stacc_id", "query", "filters", "website", "properties"],
+		'recs' => ["item_id", "stacc_id", "block_id", "website", "properties"]
 	];
 
 	/**
@@ -132,7 +147,13 @@ class Recommender_API
 			// Concatenates the API URL and endpoint path
 			$url = self::$api_url . self::$endpoints[$event_type];
 
-			//TODO data validation
+			foreach (self::$fields[$event_type] as $field)
+			{
+				if (!isset($data[$field]) || !array_key_exists($field, $data))
+				{
+					throw new Exception("Data validation failed - " . $field . " is not set");
+				}
+			}
 
 			// Sends the data to the API
 			$data_string = json_encode( $data );
@@ -199,6 +220,64 @@ class Recommender_API
             return false;
         }
     }
+
+	/**
+	 * Sends events to the API
+	 *
+	 * @since      0.3.0
+	 * @param      ArrayObject $data Data to be sent to the API
+	 * @param      int $timeout Default value 5000
+	 * @return     ArrayObject $recs Returns recommendations
+	 */
+	public function get_recommendations($data, $timeout = 5000)
+	{
+		try
+		{
+			// Gets user id and only proceeds if the user is authenticated
+			$user_id = get_current_user_id();
+
+			if ($user_id == 0)
+				throw new Exception("user isn't logged in");
+
+			// Concatenates the API URL and endpoint path
+			$url = self::$api_url . "/get_recs";
+
+			foreach (self::$fields["recs"] as $field)
+			{
+				if (!isset($data[$field]) || !array_key_exists($field, $data))
+				{
+					throw new Exception("Data validation failed - " . $field . " is not set");
+				}
+			}
+
+			// Sends the data to the API
+			$data_string = json_encode( $data );
+
+			$ch = curl_init( $url );
+			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+					'Content-Type: application/json',
+					'Content-Length: ' . strlen( $data_string )
+				)
+			);
+			curl_setopt( $ch, CURLOPT_USERPWD, self::$shop_id . ":" . self::$key );
+			curl_setopt( $ch, CURLOPT_FRESH_CONNECT, 1 );
+			curl_setopt( $ch, CURLOPT_TIMEOUT_MS, $timeout );
+			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
+			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+			$result = json_decode ( curl_exec( $ch ) );
+
+			if ($result == null)
+				throw new Exception($result['error']);
+
+			return $result;
+		}
+		catch (Exception $exception)
+		{
+			Recommender_WC_Log_Handler::logError('Event send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+			return json_decode(json_encode(array()), FALSE);
+		}
+	}
 
     /**
      * Sends events to the API
