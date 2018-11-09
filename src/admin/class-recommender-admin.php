@@ -160,7 +160,7 @@ class Recommender_Admin
         <div class="wrap">
             <h1><?= esc_html(get_admin_page_title()); ?></h1>
             <h2 class="nav-tab-wrapper">
-                <a href="?page=recommender_options&tab=connect_to_api" class="nav-tab">Connect to the API</a>
+                <a href="?page=recommender_options&tab=connect_to_api" class="nav-tab nav-tab-active">Connect to the API</a>
                 <a href="?page=recommender_options&tab=box_preferences" class="nav-tab">Box Preferences</a>
             </h2>
             <form action="options.php" method="post">
@@ -216,7 +216,7 @@ class Recommender_Admin
             <h1><?= esc_html(get_admin_page_title()); ?></h1>
             <h2 class="nav-tab-wrapper">
                 <a href="?page=recommender_options&tab=connect_to_api" class="nav-tab">Connect to the API</a>
-                <a href="?page=recommender_options&tab=box_preferences" class="nav-tab">Box Preferences</a>
+                <a href="?page=recommender_options&tab=box_preferences" class="nav-tab nav-tab-active">Box Preferences</a>
             </h2>
             <form action="options.php" method="post">
                 <?php

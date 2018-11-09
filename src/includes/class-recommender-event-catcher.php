@@ -175,7 +175,14 @@ class Recommender_Event_Catcher
          * get products related to product ID 15.
          */
         if ( ! $product ) {
-            $product = wc_get_product('15');
+            $ids = wc_get_products( array( 'return' => 'ids', 'limit' => -1 ) );
+            $ids = array_reverse($ids);
+            $id = array_pop($ids);
+            $product = wc_get_product($id);
+            if ( ! $product )
+            {
+                return;
+            }
         }
         $args = array(
             'posts_per_page' => 1,
