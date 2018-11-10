@@ -327,5 +327,11 @@ class Recommender_API
         }
     }
 
+    //just for testing returns products with id's: 11 and 12 for recommendations widget.
+    public function receive_related_ids(){
+        $related_ids = array('11', '12');
+        return $related_ids;
+    }
+
 }
 ?>

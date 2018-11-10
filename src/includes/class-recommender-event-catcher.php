@@ -32,6 +32,8 @@ class Recommender_Event_Catcher
      */
     private $version;
 
+    private static $products_to_show;
+
     /**
      * Initialize the class and set its properties.
      *
@@ -162,6 +164,15 @@ class Recommender_Event_Catcher
         Recommender_API::get_instance()->send_event($data, 'purchase');
     }
 
+    public function set_products_for_display($to_display = array()){
+        self::$products_to_show = $to_display;
+    }
+
+
+    function display_my_related_products(){
+        return self::$products_to_show;
+    }
+
     /**
      * Callback for outputting related products.
      *
@@ -185,10 +196,15 @@ class Recommender_Event_Catcher
             }
         }
         $args = array(
-            'posts_per_page' => 1,
-            'columns' => 1,
+            'posts_per_page' => 4,
+            'columns' => 4,
             'orderby' => 'rand'
         );
+
+
+        $this->set_products_for_display(Recommender_API::get_instance()->receive_related_ids());
+        add_filter( 'woocommerce_related_products', array( __CLASS__, 'display_my_related_products') );
         woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
+        //woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
     }
 }
