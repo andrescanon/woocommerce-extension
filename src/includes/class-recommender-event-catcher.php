@@ -77,7 +77,7 @@ class Recommender_Event_Catcher
                 'properties' => $filters
 
             ];
-            Recommender_API::get_instance()->send_event($data, 'search');
+            Recommender_API::get_instance()->send_post($data, 'search');
         }
         return $query;
     }
