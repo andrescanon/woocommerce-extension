@@ -217,22 +217,11 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => []
         ];
-        $received_recommendations = Recommender_API::get_instance()->get_recommendations($data_to_send);
-        if(!isset($received_recommendations[0]["items"])){
-            $received_recommendations[0]["items"] = null;
-        }
-        $received_items = $received_recommendations[0]["items"];
-        $received_ids = [];
-        foreach ((array)$received_items as $item){
-            array_push($received_ids, (string)$item->get_id());
-        }
-        Recommender_WC_Log_Handler::logInformational('IDs received from API: ' . json_encode($received_ids));
+        
+        $received_recommendations = Recommender_API::get_instance()->send_post($data_to_send, 'recs' );
+        $received_ids = $received_recommendations->{"items"};
+        Recommender_WC_Log_Handler::logInformational('Recommended product IDs received from API: ' . json_encode($received_ids));
 
-        //this is just for test purpose, every widget shows items with id '11' and '12' right now.
-        if($received_ids == []){
-            Recommender_WC_Log_Handler::logCritical('Didnt receive procuts from API');
-            $received_ids = Recommender_API::get_instance()->receive_related_ids();
-        }
         $this->set_products_for_display($received_ids);
         add_filter( 'woocommerce_related_products', array( __CLASS__, 'display_my_related_products') );
         woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
