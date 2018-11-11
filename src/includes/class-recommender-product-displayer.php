@@ -18,7 +18,7 @@ class Recommender_Product_Displayer
      * @access     private
      * @var        Recommender_Product_Displayer $instance An instance of this class
      */
-    private $instance = null;
+    private $instance;
     /**
      * The ID of this plugin.
      *
