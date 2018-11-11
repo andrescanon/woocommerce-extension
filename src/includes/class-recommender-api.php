@@ -29,7 +29,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $shop_id Shop ID
 	 */
-	private static $shop_id = 'null';
+	private static $shop_id = null;
 
 	/**
 	 * API key
@@ -38,7 +38,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API key
 	 */
-	private static $key = 'null';
+	private static $key = null;
 
 	/**
 	 * API URL
