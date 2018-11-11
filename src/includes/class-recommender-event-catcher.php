@@ -164,11 +164,19 @@ class Recommender_Event_Catcher
         Recommender_API::get_instance()->send_event($data, 'purchase');
     }
 
+    /**
+     * @param array $to_display array of products id's to show at widget
+     * @since 0.3.0
+     */
     public function set_products_for_display($to_display = array()){
         self::$products_to_show = $to_display;
     }
 
 
+    /**
+     * @return array products_to_show
+     * @since 0.3.0
+     */
     static function display_my_related_products(){
         return self::$products_to_show;
     }
@@ -210,23 +218,19 @@ class Recommender_Event_Catcher
             'properties' => []
         ];
         $received_recommendations = Recommender_API::get_instance()->get_recommendations($data_to_send);
-        error_log('mytestrecs: ' . json_encode($received_recommendations));
         if(!isset($received_recommendations[0]["items"])){
             $received_recommendations[0]["items"] = null;
         }
         $received_items = $received_recommendations[0]["items"];
         $received_ids = [];
-
         foreach ((array)$received_items as $item){
             array_push($received_ids, (string)$item->get_id());
         }
-        error_log('mytestids: ' . json_encode($received_ids));
-
-
+        Recommender_WC_Log_Handler::logInformational('IDs received from API: ' . json_encode($received_ids));
 
         //this is just for test purpose, every widget shows items with id '11' and '12' right now.
         if($received_ids == []){
-            error_log('didnt receive products ids');
+            Recommender_WC_Log_Handler::logCritical('Didnt receive procuts from API');
             $received_ids = Recommender_API::get_instance()->receive_related_ids();
         }
         $this->set_products_for_display($received_ids);
