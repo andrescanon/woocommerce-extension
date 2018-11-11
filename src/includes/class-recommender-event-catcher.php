@@ -169,7 +169,7 @@ class Recommender_Event_Catcher
     }
 
 
-    function display_my_related_products(){
+    static function display_my_related_products(){
         return self::$products_to_show;
     }
 
@@ -195,16 +195,43 @@ class Recommender_Event_Catcher
                 return;
             }
         }
+
         $args = array(
             'posts_per_page' => 4,
             'columns' => 4,
             'orderby' => 'rand'
         );
 
+        $data_to_send = [
+            'item_id' => $product->get_id(),
+            'stacc_id' => get_current_user_id(),
+            'block_id' => '0',
+            'website' => get_site_url(),
+            'properties' => []
+        ];
+        $received_recommendations = Recommender_API::get_instance()->get_recommendations($data_to_send);
+        error_log('mytestrecs: ' . json_encode($received_recommendations));
+        if(!isset($received_recommendations[0]["items"])){
+            $received_recommendations[0]["items"] = null;
+        }
+        $received_items = $received_recommendations[0]["items"];
+        $received_ids = [];
 
-        $this->set_products_for_display(Recommender_API::get_instance()->receive_related_ids());
+        foreach ((array)$received_items as $item){
+            array_push($received_ids, (string)$item->get_id());
+        }
+        error_log('mytestids: ' . json_encode($received_ids));
+
+
+
+        //this is just for test purpose, every widget shows items with id '11' and '12' right now.
+        if($received_ids == []){
+            error_log('didnt receive products ids');
+            $received_ids = Recommender_API::get_instance()->receive_related_ids();
+        }
+        $this->set_products_for_display($received_ids);
         add_filter( 'woocommerce_related_products', array( __CLASS__, 'display_my_related_products') );
         woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
-        //woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
+
     }
 }
