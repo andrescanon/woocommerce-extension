@@ -60,7 +60,10 @@ class Recommender_API
 		'add' => '/send_add_to_cart',
 		'purchase' => '/send_purchase',
 		'view' => '/send_view',
-		'search' => '/send_search'
+		'search' => '/send_search',
+        'recs' => '/get_recs',
+        'logs' => '/send_logs',
+        'catalog' => '/catalog_sync'
 	];
 
 	/**
@@ -75,7 +78,9 @@ class Recommender_API
 		'purchase' => ["stacc_id", "item_list", "website", "currency", "properties"],
 		'view' => ["item_id", "stacc_id", "website", "properties"],
 		'search' => ["stacc_id", "query", "filters", "website", "properties"],
-		'recs' => ["item_id", "stacc_id", "block_id", "website", "properties"]
+		'recs' => ["item_id", "stacc_id", "block_id", "website", "properties"],
+        'logs' => ["logs"],
+        'catalog' => ["bulk", "properties"]
 	];
 
 	/**
@@ -115,7 +120,7 @@ class Recommender_API
 	}
 
 	/**
-	 * Sends events to the API
+	 * Sends POST request to the API
 	 *
 	 * @since      0.2.0
 	 * @param      ArrayObject $data Data to be sent to the API
@@ -123,7 +128,7 @@ class Recommender_API
 	 * @param      int $timeout Default value 5000
 	 * @return     bool $status true if everything went well; false otherwise
 	 */
-	public function send_event($data, $event_type, $timeout = 5000)
+	public function send_post($data, $event_type, $timeout = 5000)
 	{
         //WP internal logging for incoming events. TODO: Once we have tested sending events to the API properly, delete this.
         // Needs in wp-config.php
@@ -131,7 +136,6 @@ class Recommender_API
         // define('WP_DEBUG_LOG', true);
         // The log will be in wp-content
         error_log($event_type);
-        error_log(print_r($data,true));
 		try
 		{
 			// Gets user id and only proceeds if the user is authenticated
@@ -158,6 +162,8 @@ class Recommender_API
 			// Sends the data to the API
 			$data_string = json_encode( $data );
 
+            error_log(print_r($data_string,true));
+
 			$ch = curl_init( $url );
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
 					'Content-Type: application/json',
@@ -175,12 +181,14 @@ class Recommender_API
 			if ($result != null)
 				throw new Exception($result['error']);
 
+			if($event_type == 'recs') return $result;
 			return true;
 		}
 		catch (Exception $exception)
 		{
-            Recommender_WC_Log_Handler::logError('Event send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-			return false;
+            Recommender_WC_Log_Handler::logError('POST send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            if($event_type == 'recs') return json_decode(json_encode(array()), FALSE);
+            return false;
 		}
 	}
 
@@ -220,112 +228,5 @@ class Recommender_API
             return false;
         }
     }
-
-	/**
-	 * Sends events to the API
-	 *
-	 * @since      0.3.0
-	 * @param      ArrayObject $data Data to be sent to the API
-	 * @param      int $timeout Default value 5000
-	 * @return     ArrayObject $recs Returns recommendations
-	 */
-	public function get_recommendations($data, $timeout = 5000)
-	{
-		try
-		{
-			// Gets user id and only proceeds if the user is authenticated
-			$user_id = get_current_user_id();
-
-			if ($user_id == 0)
-				throw new Exception("user isn't logged in");
-
-			// Concatenates the API URL and endpoint path
-			$url = self::$api_url . "/get_recs";
-
-			foreach (self::$fields["recs"] as $field)
-			{
-				if (!isset($data[$field]) || !array_key_exists($field, $data))
-				{
-					throw new Exception("Data validation failed - " . $field . " is not set");
-				}
-			}
-
-			// Sends the data to the API
-			$data_string = json_encode( $data );
-
-			$ch = curl_init( $url );
-			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
-					'Content-Type: application/json',
-					'Content-Length: ' . strlen( $data_string )
-				)
-			);
-			curl_setopt( $ch, CURLOPT_USERPWD, self::$shop_id . ":" . self::$key );
-			curl_setopt( $ch, CURLOPT_FRESH_CONNECT, 1 );
-			curl_setopt( $ch, CURLOPT_TIMEOUT_MS, $timeout );
-			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			$result = json_decode ( curl_exec( $ch ) );
-
-			if ($result == null)
-				throw new Exception($result['error']);
-
-			return $result;
-		}
-		catch (Exception $exception)
-		{
-			Recommender_WC_Log_Handler::logError('Event send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-			return json_decode(json_encode(array()), FALSE);
-		}
-	}
-
-    /**
-     * Sends events to the API
-     *
-     * @since      0.3.0
-     * @param      ArrayObject $data data to be sent to the API
-     * @param      int $timeout Default value 5000
-     * @return     bool $status true if everything went well; false otherwise
-     */
-    public function catalog_sync($data, $timeout = 5000)
-    {
-        error_log("Start catalog sync");
-        error_log(print_r($data,true));
-        try
-        {
-            // Gets user id and only proceeds if the user is authenticated
-            $user_id = get_current_user_id();
-            if ($user_id == 0)
-                throw new Exception("user isn't logged in");
-            // Concatenates the API URL and endpoint path
-            $url = self::$api_url . "/catalog_sync";
-            //TODO data validation
-            // Sends the data to the API
-            $data_string = json_encode( $data );
-            error_log(print_r($data_string,true));
-            $ch = curl_init( $url );
-            curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen( $data_string )
-                )
-            );
-            curl_setopt( $ch, CURLOPT_USERPWD, self::$shop_id . ":" . self::$key );
-            curl_setopt( $ch, CURLOPT_FRESH_CONNECT, 1 );
-            curl_setopt( $ch, CURLOPT_TIMEOUT_MS, $timeout );
-            curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
-            curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-            $result = json_decode ( curl_exec( $ch ) );
-            if ($result != null)
-                throw new Exception($result['error']);
-            return true;
-        }
-        catch (Exception $exception)
-        {
-            Recommender_WC_Log_Handler::logError('Catalog sync failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            return false;
-        }
-    }
-
 }
 ?>

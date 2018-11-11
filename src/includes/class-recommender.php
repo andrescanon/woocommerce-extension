@@ -140,6 +140,12 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
 
 
+        /**
+         * The class responsible for sending the logs
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-log-sender.php';
+
+
 
         $this->loader = new Recommender_Loader();
 
@@ -154,6 +160,7 @@ class Recommender
      */
     private function define_instances(){
         new Recommender_WC_Log_Handler($this->get_version());
+        new Recommender_Log_Sender($this->get_version());
     }
 
     /**
