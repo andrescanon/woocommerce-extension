@@ -18,8 +18,7 @@ class Recommender_Product_Displayer
      * @access     private
      * @var        Recommender_Product_Displayer $instance An instance of this class
      */
-    private static $instance = null;
-
+    private $instance = null;
     /**
      * The ID of this plugin.
      *
@@ -28,7 +27,6 @@ class Recommender_Product_Displayer
      * @var        string $plugin_name The ID of this plugin.
      */
     private $plugin_name;
-
     /**
      * The version of this plugin.
      *
@@ -37,7 +35,6 @@ class Recommender_Product_Displayer
      * @var        string $version The current version of this plugin.
      */
     private $version;
-
     /**
      * Used for storing products to display in the widget
      *
@@ -46,7 +43,6 @@ class Recommender_Product_Displayer
      * @var        array $products_to_show The ID's of the products to display.
      */
     private static $products_to_show;
-
     /**
      * Prevents cloning of a class instance
      *
@@ -54,17 +50,15 @@ class Recommender_Product_Displayer
      * @access     private
      */
     private function __clone() {}
-
     /**
      * Returns an instance of this class
      *
      * @since      0.3.0
      */
-    public static function get_instance()
+    public function get_instance()
     {
-        return self::$instance;
+        return $this->instance;
     }
-
     /**
      * Initialize the class and set its properties.
      *
@@ -76,8 +70,8 @@ class Recommender_Product_Displayer
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
+        $this->instance = $this;
     }
-
     /**
      * @param array $to_display array of products id's to show at widget
      * @since 0.3.0
@@ -85,8 +79,6 @@ class Recommender_Product_Displayer
     public function set_products_for_display($to_display = array()){
         self::$products_to_show = $to_display;
     }
-
-
     /**
      * @return array products_to_show
      * @since 0.3.0
@@ -94,7 +86,6 @@ class Recommender_Product_Displayer
     static function display_my_related_products(){
         return self::$products_to_show;
     }
-
     /**
      * Callback for outputting related products.
      *
@@ -103,21 +94,7 @@ class Recommender_Product_Displayer
     public function woocommerce_output_related_products(){
         global $product;
 
-        /*
-         * Just a temporary solution for testing purposes. If no product available to get related products to,
-         * get products related to product ID 15.
-         */
-        if ( ! $product ) {
-            $ids = wc_get_products( array( 'return' => 'ids', 'limit' => -1 ) );
-            $ids = array_reverse($ids);
-            $id = array_pop($ids);
-            $product = wc_get_product($id);
-            if ( ! $product )
-            {
-                return;
-            }
-        }
-
+        //widget related
         $args = array(
             'posts_per_page' => 4,
             'columns' => 4,
@@ -135,10 +112,8 @@ class Recommender_Product_Displayer
         $received_recommendations = Recommender_API::get_instance()->send_post($data_to_send, 'recs' );
         $received_ids = $received_recommendations->{"items"};
         Recommender_WC_Log_Handler::logInformational('Recommended product IDs received from API: ' . json_encode($received_ids));
-
         $this->set_products_for_display($received_ids);
         add_filter( 'woocommerce_related_products', array( __CLASS__, 'display_my_related_products') );
         woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
-
     }
 }
