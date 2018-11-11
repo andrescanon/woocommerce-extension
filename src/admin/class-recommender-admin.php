@@ -94,14 +94,6 @@ class Recommender_Admin
      */
     public function recommender_options_page()
     {
-        //juts for testing logging atm:
-        Recommender_WC_Log_Handler::logCritical('testMessage1');
-        Recommender_WC_Log_Handler::set_sent_and_empty_output_file();
-        Recommender_WC_Log_Handler::logAlert('testMessage2');
-        Recommender_WC_Log_Handler::logDebug('testMessage3');
-
-        //-----------
-
         if (!current_user_can('manage_options')) {
             return;
         }
@@ -139,6 +131,7 @@ class Recommender_Admin
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
                     Recommender_WC_Log_Handler::logAlert('API is Offline');
                     # TODO; Remove in live environment, currently here for testing purpsoses
+                    Recommender_Log_Sender::get_instance()->recommender_send_logs();
                     if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
                         add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
                     } else {

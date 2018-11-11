@@ -70,7 +70,7 @@ class Recommender_Event_Catcher
                 'website' => get_site_url(),
                 'properties' => []
             ];
-            Recommender_API::get_instance()->send_event($data, 'search');
+            Recommender_API::get_instance()->send_post($data, 'search');
         }
         return $query;
     }
@@ -98,7 +98,7 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()->send_event($data, 'add');
+        Recommender_API::get_instance()->send_post($data, 'add');
     }
 
     /**
@@ -125,7 +125,7 @@ class Recommender_Event_Catcher
         if (get_option('disable_default_box') == 1)
             remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
-        Recommender_API::get_instance()->send_event($data, 'view');
+        Recommender_API::get_instance()->send_post($data, 'view');
     }
 
     /**
@@ -161,7 +161,7 @@ class Recommender_Event_Catcher
             'currency' => $currency,
             'properties' => []
         ];
-        Recommender_API::get_instance()->send_event($data, 'purchase');
+        Recommender_API::get_instance()->send_post($data, 'purchase');
     }
 
     /**

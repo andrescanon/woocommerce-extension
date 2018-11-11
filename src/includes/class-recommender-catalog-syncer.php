@@ -81,7 +81,7 @@ class Recommender_Catalog_Syncer
                 'properties' => []
             ];
 
-            Recommender_API::get_instance()->catalog_sync($data);
+            Recommender_API::get_instance()->send_post($data, 'catalog');
         }
         return true;
     }
