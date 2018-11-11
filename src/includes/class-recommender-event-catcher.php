@@ -58,17 +58,26 @@ class Recommender_Event_Catcher
     {
         if ( $query->is_search )
         {
-            $query_string = get_search_query(true);
+            $_chosen_attributes = WC_Query::get_layered_nav_chosen_attributes();
+            $filters = [];
+            foreach ($_chosen_attributes as $key => $value)
+                if (is_array($value) && array_key_exists('terms', $value))
+                    $filters[$key] = $value['terms'];
+
+            $filters['min_price'] = isset( $_GET['min_price'] ) ? esc_attr( $_GET['min_price'] ) : 0;
+            $filters['max_price'] = isset( $_GET['max_price'] ) ? esc_attr( $_GET['max_price'] ) : 0;
+
+            $search_query = get_search_query(true);
             //$args = $query->query;
-            //TODO retrieve filters
             $data = [
                 'stacc_id' => get_current_user_id(),
-                'query' => $query_string,
-                'filters' => [],
+                'query' => $search_query,
+                'filters' => $_SERVER['QUERY_STRING'],
                 'website' => get_site_url(),
-                'properties' => []
+                'properties' => $filters
+
             ];
-            Recommender_API::get_instance()->send_post($data, 'search');
+            Recommender_API::get_instance()->send_event($data, 'search');
         }
         return $query;
     }
