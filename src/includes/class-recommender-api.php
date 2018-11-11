@@ -178,8 +178,9 @@ class Recommender_API
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			$result = json_decode ( curl_exec( $ch ) );
 
-			if ($result != null)
-				throw new Exception($result['error']);
+			//TODO should be fixed asap, not working like that
+            //if ($result != null)
+			//	throw new Exception($result['error']);
 
 			if($event_type == 'recs') return $result;
 			return true;
@@ -228,5 +229,6 @@ class Recommender_API
             return false;
         }
     }
+
 }
 ?>
