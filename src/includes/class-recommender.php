@@ -135,6 +135,11 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-event-catcher.php';
 
         /**
+         * The class responsible for displaying recommended products.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-product-displayer.php';
+
+        /**
          * The class responsible for syncing the stores catalog.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
@@ -190,6 +195,7 @@ class Recommender
     {
 
         $plugin_catcher = new Recommender_Event_Catcher($this->get_plugin_name(), $this->get_version());
+        $product_displayer = new Recommender_Product_Displayer($this->get_plugin_name(), $this->get_version());
 
         $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'woocommerce_add_to_cart_callback', 10, 6);
         $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'woocommerce_single_product_summary_callback', 25);
@@ -204,7 +210,7 @@ class Recommender
         foreach ($options as $option) {
             if (get_option($option) != false)
             {
-                $this->loader->add_action($option, $plugin_catcher, 'woocommerce_output_related_products', get_option($option));
+                $this->loader->add_action($option, $product_displayer, 'woocommerce_output_related_products', get_option($option));
             }
         }
     }

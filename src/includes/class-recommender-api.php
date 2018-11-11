@@ -29,7 +29,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $shop_id Shop ID
 	 */
-	private static $shop_id = null;
+	private static $shop_id = 'testpood';
 
 	/**
 	 * API key
@@ -38,7 +38,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API key
 	 */
-	private static $key = null;
+	private static $key = '123';
 
 	/**
 	 * API URL
@@ -47,7 +47,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API URL
 	 */
-	private static $api_url = 'http://127.0.0.1:5678/';
+	private static $api_url = 'http://127.0.0.1:5678/api/v2';
 
 	/**
 	 * API endpoints
@@ -178,8 +178,8 @@ class Recommender_API
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			$result = json_decode ( curl_exec( $ch ) );
 
-			if ($result != null)
-				throw new Exception($result['error']);
+            //if ($result != null)
+			//	throw new Exception($result['error']);
 
 			if($event_type == 'recs') return $result;
 			return true;
@@ -227,6 +227,12 @@ class Recommender_API
             Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return false;
         }
+    }
+
+    public function receive_related_ids(){
+        $related_ids = array('11', '12');
+
+        return $related_ids;
     }
 }
 ?>
