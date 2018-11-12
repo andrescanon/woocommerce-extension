@@ -17,7 +17,8 @@ A step by step tutorial to get the extension up and running.
 
 ## Deployment
 
-Currently it isn't possible to connect to the API without the help of the authors of the plugin
+Currently it isn't possible to connect to the API without the help of the authors of the plugin.
+Because of this, most of the functionality can't be seen.
 
 ## Built With
 
