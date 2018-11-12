@@ -1,3 +1,5 @@
+//Based on:
+//https://github.com/lmc-eu/steward-example
 {
   "prefer-stable": true,
   "minimum-stability": "dev",

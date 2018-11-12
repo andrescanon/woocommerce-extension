@@ -1,3 +1,6 @@
+# Added automating testing capability based on:
+# https://github.com/lmc-eu/steward-example
+
 sudo: required
 
 language: php

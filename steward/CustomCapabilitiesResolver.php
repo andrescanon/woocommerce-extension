@@ -1,4 +1,7 @@
 <?php declare(strict_types=1);
+# Based on:
+# https://github.com/lmc-eu/steward-example
+
 namespace My\Steward;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;

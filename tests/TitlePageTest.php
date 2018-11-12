@@ -1,4 +1,6 @@
 <?php declare(strict_types=1);
+# Based on:
+# https://github.com/lmc-eu/steward-example
 namespace My\Tests;
 
 use Facebook\WebDriver\WebDriverElement;
