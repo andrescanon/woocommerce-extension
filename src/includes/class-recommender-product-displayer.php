@@ -93,6 +93,18 @@ class Recommender_Product_Displayer
      */
     public function woocommerce_output_related_products(){
         global $product;
+        
+        //if cant get product, takes first product from product list
+        if ( ! $product ) {
+            $ids = wc_get_products( array( 'return' => 'ids', 'limit' => -1 ) );
+            $ids = array_reverse($ids);
+            $id = array_pop($ids);
+            $product = wc_get_product($id);
+            if ( ! $product )
+            {
+                return;
+            }
+        }
 
         //widget related
         $args = array(
