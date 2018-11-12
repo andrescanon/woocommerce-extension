@@ -77,13 +77,14 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
         }
 
     }
-
+    
     /**
      * Initialize the class and set its properties.
      *
      * @since      0.3.0
      * @access     public
      * @param      $version string plugin version
+     * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
      */
     public function __construct($version , $log_size_limit = null) {
 

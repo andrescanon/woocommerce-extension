@@ -32,6 +32,7 @@ class Recommender_Event_Catcher
      */
     private $version;
 
+
     /**
      * Initialize the class and set its properties.
      *
@@ -58,15 +59,24 @@ class Recommender_Event_Catcher
     {
         if ( $query->is_search )
         {
-            $query_string = get_search_query(true);
+            $_chosen_attributes = WC_Query::get_layered_nav_chosen_attributes();
+            $filters = [];
+            foreach ($_chosen_attributes as $key => $value)
+                if (is_array($value) && array_key_exists('terms', $value))
+                    $filters[$key] = $value['terms'];
+
+            $filters['min_price'] = isset( $_GET['min_price'] ) ? esc_attr( $_GET['min_price'] ) : 0;
+            $filters['max_price'] = isset( $_GET['max_price'] ) ? esc_attr( $_GET['max_price'] ) : 0;
+
+            $search_query = get_search_query(true);
             //$args = $query->query;
-            //TODO retrieve filters
             $data = [
                 'stacc_id' => get_current_user_id(),
-                'query' => $query_string,
-                'filters' => [],
+                'query' => $search_query,
+                'filters' => $_SERVER['QUERY_STRING'],
                 'website' => get_site_url(),
-                'properties' => []
+                'properties' => $filters
+
             ];
             Recommender_API::get_instance()->send_post($data, 'search');
         }
@@ -162,33 +172,5 @@ class Recommender_Event_Catcher
         Recommender_API::get_instance()->send_post($data, 'purchase');
     }
 
-    /**
-     * Callback for outputting related products.
-     *
-     * @since 0.3.0
-     */
-    function woocommerce_output_related_products(){
-        global $product;
 
-        /*
-         * Just a temporary solution for testing purposes. If no product available to get related products to,
-         * get products related to product ID 15.
-         */
-        if ( ! $product ) {
-            $ids = wc_get_products( array( 'return' => 'ids', 'limit' => -1 ) );
-            $ids = array_reverse($ids);
-            $id = array_pop($ids);
-            $product = wc_get_product($id);
-            if ( ! $product )
-            {
-                return;
-            }
-        }
-        $args = array(
-            'posts_per_page' => 1,
-            'columns' => 1,
-            'orderby' => 'rand'
-        );
-        woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
-    }
 }
