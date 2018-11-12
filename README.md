@@ -21,7 +21,8 @@ Currently it isn't possible to connect to the API without the help of the author
 
 ## Built With
 
-* [PHP](http://php.net/) - Test link
+* [PHP](http://php.net/)
+* [Steward](https://github.com/lmc-eu/steward) - For Automated Testing
 
 
 ## Versioning
