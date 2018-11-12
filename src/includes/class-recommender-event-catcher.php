@@ -148,7 +148,7 @@ class Recommender_Event_Catcher
         $item_list = array();
         foreach ( $items as $item )
         {
-            $product_id = $item->get_id();
+            $product_id = $item['product_id'];
             $product_quantity = $item->get_quantity();
             $price = $order->get_item_total($item);
             $item_arr =  [
