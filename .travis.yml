@@ -1,13 +1,34 @@
+# Added automating testing capability based on:
+# https://github.com/lmc-eu/steward-example
+
 sudo: required
 
 language: php
 
+dist: trusty
+
 php:
-  - "7.1"
+  - 7.2
+
+addons:
+  chrome: stable
   
 env:
-  - WP_VERSION=latest
-  
+  global:
+    - USE_STEWARD_MASTER=1 # During Steward 3.0 development always run against latest Steward master branch
+    - SELENIUM_SERVER_VERSION="3.141.5"
+    - CHROMEDRIVER_VERSION="2.43"
+    - WP_VERSION=latest
+  matrix:
+    - BROWSER=chrome
+
+install:
+  - composer install --no-interaction
+  - SELENIUM_PATH=$(./vendor/bin/steward install $SELENIUM_SERVER_VERSION --no-interaction)
+  - echo "Selenium server path:" $SELENIUM_PATH
+  - if [ "$BROWSER" = "chrome" ]; then mkdir chromedriver; wget -q -t 3 https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip; unzip chromedriver_linux64 -d chromedriver; fi
+  - if [ "$BROWSER" = "chrome" ]; then export CHROMEDRIVER_PATH=./chromedriver/chromedriver; fi
+
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
     - git clone git://develop.git.wordpress.org/ /tmp/wordpress
@@ -28,5 +49,22 @@ before_script:
     - npm install -g grunt-cli
     - npm install
     - grunt build
-    
-script: phpunit
+    - wget -qO /dev/null $DEMO_DEPLOY_URL  > /dev/null 2>&1
+    - cd $TRAVIS_BUILD_DIR
+    - java -jar $SELENIUM_PATH -role hub -log selenium-server.log &
+    - until $(echo | nc localhost 4444); do sleep 1; echo Waiting for selenium-server to start...; done;
+    - if [ "$BROWSER" = "chrome" ]; then java -Dwebdriver.chrome.driver="$CHROMEDRIVER_PATH" -jar $SELENIUM_PATH -role node -port 8910 -log selenium-node-1.log & fi
+    - sleep 3
+
+script:
+    # - phpunit
+    - ./vendor/bin/steward run demo $BROWSER -vvv
+
+after_script:
+    - ./vendor/bin/steward results -vvv
+    - cat selenium-server.log
+    - cat selenium-node-1.log
+
+cache:
+  directories:
+    - $HOME/.composer/cache

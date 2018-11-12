@@ -1,0 +1,19 @@
+{
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^7.1",
+    "lmc/steward": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "My\\Steward\\": "steward/",
+      "My\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "7.2"
+    }
+  }
+}

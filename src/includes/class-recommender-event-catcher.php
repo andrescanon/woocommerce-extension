@@ -32,6 +32,7 @@ class Recommender_Event_Catcher
      */
     private $version;
 
+
     /**
      * Initialize the class and set its properties.
      *
@@ -58,17 +59,26 @@ class Recommender_Event_Catcher
     {
         if ( $query->is_search )
         {
-            $query_string = get_search_query(true);
+            $_chosen_attributes = WC_Query::get_layered_nav_chosen_attributes();
+            $filters = [];
+            foreach ($_chosen_attributes as $key => $value)
+                if (is_array($value) && array_key_exists('terms', $value))
+                    $filters[$key] = $value['terms'];
+
+            $filters['min_price'] = isset( $_GET['min_price'] ) ? esc_attr( $_GET['min_price'] ) : 0;
+            $filters['max_price'] = isset( $_GET['max_price'] ) ? esc_attr( $_GET['max_price'] ) : 0;
+
+            $search_query = get_search_query(true);
             //$args = $query->query;
-            //TODO retrieve filters
             $data = [
                 'stacc_id' => get_current_user_id(),
-                'query' => $query_string,
-                'filters' => [],
+                'query' => $search_query,
+                'filters' => $_SERVER['QUERY_STRING'],
                 'website' => get_site_url(),
-                'properties' => []
+                'properties' => $filters
+
             ];
-            Recommender_API::get_instance()->send_event($data, 'search');
+            Recommender_API::get_instance()->send_post($data, 'search');
         }
         return $query;
     }
@@ -96,7 +106,7 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()->send_event($data, 'add');
+        Recommender_API::get_instance()->send_post($data, 'add');
     }
 
     /**
@@ -120,7 +130,10 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()->send_event($data, 'view');
+        if (get_option('disable_default_box') == 1)
+            remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
+        Recommender_API::get_instance()->send_post($data, 'view');
     }
 
     /**
@@ -136,7 +149,7 @@ class Recommender_Event_Catcher
         $item_list = array();
         foreach ( $items as $item )
         {
-            $product_id = $item->get_id();
+            $product_id = $item['product_id'];
             $product_quantity = $item->get_quantity();
             $price = $order->get_item_total($item);
             $item_arr =  [
@@ -156,6 +169,8 @@ class Recommender_Event_Catcher
             'currency' => $currency,
             'properties' => []
         ];
-        Recommender_API::get_instance()->send_event($data, 'purchase');
+        Recommender_API::get_instance()->send_post($data, 'purchase');
     }
+
+
 }

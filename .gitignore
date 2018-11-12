@@ -86,3 +86,16 @@ fabric.properties
 .idea/modules.xml
 .idea/vcs.xml
 .idea/woocommerce-extension.iml
+
+# From https://github.com/lmc-eu/steward-example/blob/feature/next/.gitignore
+# Ignore libraries installed using Composer
+composer.phar
+vendor
+
+# Ignore test logs
+logs
+
+# Temporary ignore composer.lock, because during Steward 3.0 development all build are run with composer update.
+composer.lock
+
+credentials.json

@@ -19,6 +19,7 @@
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  * @author     Stiivo Siider <stiivosiider@gmail.com>
  * @author     Martin Jürgel <martin457345@gmail.com>
+ * @author     Hannes Saariste <hannes.saariste@gmail.com>
  */
 class Recommender
 {
@@ -71,6 +72,7 @@ class Recommender
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_event_hooks_filters();
+        $this->define_instances();
     }
 
     /**
@@ -92,6 +94,21 @@ class Recommender
     {
 
         /**
+         * Loads log handler interface
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/interfaces/class-wc-log-handler-interface.php' ;
+
+        /**
+         * Loads log handler
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/abstracts/abstract-wc-log-handler.php' ;
+
+        /**
+         * Loads log handler file so it can be extended
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
+
+        /**
          * The class responsible for orchestrating the actions and filters of the
          * core plugin.
          */
@@ -108,12 +125,47 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-api.php';
 
         /**
+         * Log handler for logging.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-wc-handler.php';
+
+        /**
          * The class responsible for catching WooCommerce events.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-event-catcher.php';
 
+        /**
+         * The class responsible for displaying recommended products.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-product-displayer.php';
+
+        /**
+         * The class responsible for syncing the stores catalog.
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
+
+
+        /**
+         * The class responsible for sending the logs
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-log-sender.php';
+
+
+
         $this->loader = new Recommender_Loader();
 
+    }
+
+    /**
+     * Define internal instances of classes
+     * instance Recommender_WC_Log_Handler
+     *
+     * @since    0.3.0
+     * @access   private
+     */
+    private function define_instances(){
+        new Recommender_WC_Log_Handler($this->get_version());
+        new Recommender_Log_Sender($this->get_version());
     }
 
     /**
@@ -143,11 +195,24 @@ class Recommender
     {
 
         $plugin_catcher = new Recommender_Event_Catcher($this->get_plugin_name(), $this->get_version());
+        $product_displayer = new Recommender_Product_Displayer($this->get_plugin_name(), $this->get_version());
 
         $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'woocommerce_add_to_cart_callback', 10, 6);
         $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'woocommerce_single_product_summary_callback', 25);
         $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'woocommerce_payment_complete_callback');
         $this->loader->add_filter('pre_get_posts', $plugin_catcher,'woocommerce_search_callback');
+
+        $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
+            "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
+            "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"
+        );
+
+        foreach ($options as $option) {
+            if (get_option($option) != false)
+            {
+                $this->loader->add_action($option, $product_displayer, 'woocommerce_output_related_products', get_option($option));
+            }
+        }
     }
 
     /**

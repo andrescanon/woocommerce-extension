@@ -47,7 +47,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API URL
 	 */
-	private static $api_url = 'TODO';
+	private static $api_url = 'http://127.0.0.1:5678/';
 
 	/**
 	 * API endpoints
@@ -60,7 +60,27 @@ class Recommender_API
 		'add' => '/send_add_to_cart',
 		'purchase' => '/send_purchase',
 		'view' => '/send_view',
-		'search' => '/send_search'
+		'search' => '/send_search',
+        'recs' => '/get_recs',
+        'logs' => '/send_logs',
+        'catalog' => '/catalog_sync'
+	];
+
+	/**
+	 * Needed fields for endpoints
+	 *
+	 * @since      0.3.0
+	 * @access     private
+	 * @var        ArrayObject $fields JSON field information
+	 */
+	private static $fields = [
+		'add' => ["item_id", "stacc_id", "website", "properties"],
+		'purchase' => ["stacc_id", "item_list", "website", "currency", "properties"],
+		'view' => ["item_id", "stacc_id", "website", "properties"],
+		'search' => ["stacc_id", "query", "filters", "website", "properties"],
+		'recs' => ["item_id", "stacc_id", "block_id", "website", "properties"],
+        'logs' => ["logs"],
+        'catalog' => ["bulk", "properties"]
 	];
 
 	/**
@@ -74,6 +94,9 @@ class Recommender_API
 		//TODO validation, error-handling
 		self::$shop_id = get_option('shop_id');
 		self::$key = get_option('api_key');
+
+        //if problem:
+        //Recommender_WC_Log_Handler::logError('Validation Error');
 	}
 
 	/**
@@ -97,7 +120,7 @@ class Recommender_API
 	}
 
 	/**
-	 * Sends events to the API
+	 * Sends POST request to the API
 	 *
 	 * @since      0.2.0
 	 * @param      ArrayObject $data Data to be sent to the API
@@ -105,8 +128,17 @@ class Recommender_API
 	 * @param      int $timeout Default value 5000
 	 * @return     bool $status true if everything went well; false otherwise
 	 */
-	public function send_event($data, $event_type, $timeout = 5000)
+	public function send_post($data, $event_type, $timeout = 5000)
 	{
+        //WP internal logging for incoming events.
+        // Needs in wp-config.php
+        // define('WP_DEBUG', true);
+        // define('WP_DEBUG_LOG', true);
+        // The log will be in wp-content
+        // These logs are used for Selenium tests
+
+        if ($event_type != 'recs')
+            error_log($event_type);
 		try
 		{
 			// Gets user id and only proceeds if the user is authenticated
@@ -122,10 +154,18 @@ class Recommender_API
 			// Concatenates the API URL and endpoint path
 			$url = self::$api_url . self::$endpoints[$event_type];
 
-			//TODO data validation
+			foreach (self::$fields[$event_type] as $field)
+			{
+				if (!isset($data[$field]) || !array_key_exists($field, $data))
+				{
+					throw new Exception("Data validation failed - " . $field . " is not set");
+				}
+			}
 
 			// Sends the data to the API
 			$data_string = json_encode( $data );
+            //if ($event_type != 'recs')
+            //    error_log(print_r($data_string,true));
 
 			$ch = curl_init( $url );
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
@@ -141,15 +181,18 @@ class Recommender_API
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			$result = json_decode ( curl_exec( $ch ) );
 
-			if ($result != null)
-				throw new Exception($result['error']);
+			//TODO should be fixed asap, not working like that
+            //if ($result != null)
+			//	throw new Exception($result['error']);
 
+			if($event_type == 'recs') return $result;
 			return true;
 		}
 		catch (Exception $exception)
 		{
-			//TODO logging
-			return false;
+            Recommender_WC_Log_Handler::logError('POST send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            if($event_type == 'recs') return json_decode(json_encode(array()), FALSE);
+            return false;
 		}
 	}
 
@@ -185,19 +228,10 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            //TODO logging
+            Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return false;
         }
     }
 
-    /**
-     * Synchronizes the store's products to STACC's servers
-     *
-     * @return bool Is the product sync successful
-     */
-    public function sync_products(){
-	    //TODO: Implement product sync
-	    return true;
-    }
 }
 ?>
