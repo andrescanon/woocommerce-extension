@@ -130,12 +130,15 @@ class Recommender_API
 	 */
 	public function send_post($data, $event_type, $timeout = 5000)
 	{
-        //WP internal logging for incoming events. TODO: Once we have tested sending events to the API properly, delete this.
+        //WP internal logging for incoming events.
         // Needs in wp-config.php
         // define('WP_DEBUG', true);
         // define('WP_DEBUG_LOG', true);
         // The log will be in wp-content
-        error_log($event_type);
+        // These logs are used for Selenium tests
+
+        if ($event_type != 'recs')
+            error_log($event_type);
 		try
 		{
 			// Gets user id and only proceeds if the user is authenticated
@@ -161,8 +164,8 @@ class Recommender_API
 
 			// Sends the data to the API
 			$data_string = json_encode( $data );
-
-            error_log(print_r($data_string,true));
+            //if ($event_type != 'recs')
+            //    error_log(print_r($data_string,true));
 
 			$ch = curl_init( $url );
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
@@ -178,8 +181,9 @@ class Recommender_API
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			$result = json_decode ( curl_exec( $ch ) );
 
-			if ($result != null)
-				throw new Exception($result['error']);
+			//TODO should be fixed asap, not working like that
+            //if ($result != null)
+			//	throw new Exception($result['error']);
 
 			if($event_type == 'recs') return $result;
 			return true;
@@ -228,5 +232,6 @@ class Recommender_API
             return false;
         }
     }
+
 }
 ?>

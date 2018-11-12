@@ -48,9 +48,9 @@ class Recommender_Log_Sender
         return self::$instance;
     }
 
-    /**
+     /**
      * Initialize the class and set its properties.
-     *
+     * @param $version string used for plugin version
      * @since      0.3.0
      */
     public function __construct($version)

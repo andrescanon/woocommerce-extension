@@ -32,6 +32,7 @@ class Recommender_Event_Catcher
      */
     private $version;
 
+
     /**
      * Initialize the class and set its properties.
      *
@@ -171,33 +172,5 @@ class Recommender_Event_Catcher
         Recommender_API::get_instance()->send_post($data, 'purchase');
     }
 
-    /**
-     * Callback for outputting related products.
-     *
-     * @since 0.3.0
-     */
-    function woocommerce_output_related_products(){
-        global $product;
 
-        /*
-         * Just a temporary solution for testing purposes. If no product available to get related products to,
-         * get products related to product ID 15.
-         */
-        if ( ! $product ) {
-            $ids = wc_get_products( array( 'return' => 'ids', 'limit' => -1 ) );
-            $ids = array_reverse($ids);
-            $id = array_pop($ids);
-            $product = wc_get_product($id);
-            if ( ! $product )
-            {
-                return;
-            }
-        }
-        $args = array(
-            'posts_per_page' => 1,
-            'columns' => 1,
-            'orderby' => 'rand'
-        );
-        woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
-    }
 }
