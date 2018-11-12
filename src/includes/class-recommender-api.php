@@ -164,8 +164,7 @@ class Recommender_API
 
 			// Sends the data to the API
 			$data_string = json_encode( $data );
-            //if ($event_type != 'recs')
-            //    error_log(print_r($data_string,true));
+            Recommender_WC_Log_Handler::logDebug($event_type .": " . $data_string);
 
 			$ch = curl_init( $url );
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
@@ -218,6 +217,7 @@ class Recommender_API
             if (!curl_errno($ch)){
                 switch ($http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)){
                     case 200:
+                        Recommender_WC_Log_Handler::logDebug("Connection to the API possible.");
                         return true;
                     default:
                         throw new Exception("Unexpected code: " . $http_code);
