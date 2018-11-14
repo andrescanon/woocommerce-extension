@@ -122,23 +122,20 @@ class Recommender_Admin
                 if (Recommender_API::get_instance()->has_connection()) {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
                     if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
-                        add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
+                        add_settings_error('recommender_messages', 'recommender_product_sync', __('Products synced', 'recommender'), 'updated');
                     } else {
                         add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
                         Recommender_WC_Log_Handler::logCritical('Product sync failed');
+                    }
+                    if(Recommender_Log_Sender::get_instance()->recommender_send_logs()){
+                        add_settings_error('recommender_messages', 'recommender_send_logs', __('Logs sent', 'recommender'), 'updated');
+                    } else {
+                        add_settings_error('recommender_messages', 'recommender_api_connection', __('Log sending failed', 'recommender'), 'updated');
+                        Recommender_WC_Log_Handler::logCritical('Log sending failed');
                     }
                 } else {
                     add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
                     Recommender_WC_Log_Handler::logAlert('API is Offline');
-                    # TODO; Remove in live environment, currently here for testing purpsoses
-                    Recommender_Log_Sender::get_instance()->recommender_send_logs();
-                    if(Recommender_Catalog_Syncer::get_instance()->recommender_catalog_sync_callback()){
-                        add_settings_error('recommender_messages', 'recommender_product sync', __('Products synced', 'recommender'), 'updated');
-                    } else {
-                        add_settings_error('recommender_messages', 'recommender_api_connection', __('Product sync failed', 'recommender'), 'updated');
-                        Recommender_WC_Log_Handler::logCritical('Product sync failed');
-                    }
-                    # END;
                 }
                 add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
                 settings_errors('recommender_messages');
