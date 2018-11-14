@@ -47,7 +47,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API URL
 	 */
-	private static $api_url = 'http://127.0.0.1:5678/';
+	private static $api_url = 'http://127.0.0.1:5678/api/v2';
 
 	/**
 	 * API endpoints
