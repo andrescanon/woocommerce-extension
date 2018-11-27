@@ -28,7 +28,7 @@ abstract class AbstractTestCase extends \Lmc\Steward\Test\AbstractTestCase
         // Set base url according to environment
         switch (ConfigProvider::getInstance()->env) {
             case 'demo':
-                self::$baseUrl = 'http://193.40.11.165/wordpress';
+                self::$baseUrl = getenv('DEMO_URL');
                 break;
             case 'local':
                 self::$baseUrl = 'http://localhost/wordpress';
