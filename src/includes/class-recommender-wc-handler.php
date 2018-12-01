@@ -1,6 +1,17 @@
 <?php
 /**
  * Modified log handler
+ *
+ * Log Level types
+ * Emergency: system is unusable
+ * Alert: action must be taken immediately
+ * Critical: critical conditions
+ * Error: error conditions
+ * Warning: warning conditions
+ * Notice: normal but significant condition
+ * Informational: informational messages
+ * Debug: debug-level messages
+ *
  * @since      0.3.0
  * @package    Recommendations
  * @subpackage Recommendations/includes
@@ -63,10 +74,10 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     public static function set_sent_and_empty_output_file(){
         if(copy(self::$output_file_path,
             WP_CONTENT_DIR . '/uploads/wc-logs/' . self::$output_file . '_sent.log')){
-            self::logNotice("Making copy of log file to " . self::$output_file . '_sent.log succeeded');
+            self::logDebug("Making copy of log file to " . self::$output_file . '_sent.log succeeded');
 
             if(self::get_instance()->remove(self::$output_file)){
-                self::logNotice("Old log file successfully deleted");
+                self::logDebug("Old log file successfully deleted");
             }
             else{
                 self::logWarning("Old log file was not deleted!");

@@ -138,7 +138,7 @@ class Recommender_Log_Sender
                 "extension_version" => self::$version
             ]], $logs);
         } catch (Exception $exception) {
-            Recommender_WC_Log_Handler::logCritical("Recommender_Log_Sender->recommender_retrieve_logs() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            Recommender_WC_Log_Handler::logError("Recommender_Log_Sender->recommender_retrieve_logs() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));
         }
 
         return $logs;
