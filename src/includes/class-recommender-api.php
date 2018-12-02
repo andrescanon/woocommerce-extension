@@ -91,12 +91,8 @@ class Recommender_API
 	 */
 	private function __construct()
 	{
-		//TODO validation, error-handling
 		self::$shop_id = get_option('shop_id');
 		self::$key = get_option('api_key');
-
-        //if problem:
-        //Recommender_WC_Log_Handler::logError('Validation Error');
 	}
 
 	/**
@@ -180,12 +176,17 @@ class Recommender_API
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 			$result = json_decode ( curl_exec( $ch ) );
 
-			//TODO should be fixed asap, not working like that
-            //if ($result != null)
-			//	throw new Exception($result['error']);
-
-			if($event_type == 'recs') return $result;
-			return true;
+            if (!curl_errno($ch)){
+                switch ($http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)){
+                    case 200:
+                        if($event_type == 'recs') return $result;
+                        return true;
+                    default:
+                        throw new Exception("Unexpected code: " . $http_code . "; With result: " . $result);
+                }
+            } else {
+                throw new Exception(curl_error($ch));
+            }
 		}
 		catch (Exception $exception)
 		{
@@ -228,7 +229,7 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            Recommender_WC_Log_Handler::logError('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return false;
         }
     }
