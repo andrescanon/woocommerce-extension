@@ -80,7 +80,7 @@ class Recommender_Product_Displayer
         $received_ids = $received_recommendations->{"items"};
         Recommender_WC_Log_Handler::logDebug('Recommended product IDs received from API: ' . json_encode($received_ids));
         $this->set_products_for_display($received_ids);
-        add_filter( 'woocommerce_related_products', array( __CLASS__, 'display_my_related_products') );
+        add_filter( 'woocommerce_related_products', array( $this, 'display_my_related_products') );
         woocommerce_related_products( apply_filters( 'woocommerce_output_related_products_args', $args ) );
     }
 }
