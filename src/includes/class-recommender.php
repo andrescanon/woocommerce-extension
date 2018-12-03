@@ -73,7 +73,6 @@ class Recommender
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_event_hooks_filters();
-        $this->define_instances();
     }
 
     /**
