@@ -65,6 +65,7 @@ class Recommender
         if (defined('PLUGIN_NAME_VERSION')) {
             $this->version = PLUGIN_NAME_VERSION;
         } else {
+            define('PLUGIN_NAME_VERSION', '0.1.0');
             $this->version = '0.1.0';
         }
         $this->plugin_name = 'recommender';
@@ -144,7 +145,6 @@ class Recommender
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
 
-
         /**
          * The class responsible for sending the logs
          */
@@ -152,18 +152,6 @@ class Recommender
 
         $this->loader = new Recommender_Loader();
 
-    }
-
-    /**
-     * Define internal instances of classes
-     * instance Recommender_WC_Log_Handler
-     *
-     * @since    0.3.0
-     * @access   private
-     */
-    private function define_instances(){
-        new Recommender_WC_Log_Handler($this->get_version());
-        new Recommender_Log_Sender($this->get_version());
     }
 
     /**
@@ -192,13 +180,13 @@ class Recommender
     private function define_event_hooks_filters()
     {
 
-        $plugin_catcher = new Recommender_Event_Catcher($this->get_plugin_name(), $this->get_version());
-        $product_displayer = new Recommender_Product_Displayer($this->get_plugin_name(), $this->get_version());
+        $event_catcher = new Recommender_Event_Catcher();
+        $product_displayer = new Recommender_Product_Displayer();
 
-        $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'woocommerce_add_to_cart_callback', 10, 6);
-        $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'woocommerce_single_product_summary_callback', 25);
-        $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'woocommerce_payment_complete_callback');
-        $this->loader->add_filter('pre_get_posts', $plugin_catcher,'woocommerce_search_callback');
+        $this->loader->add_action('woocommerce_add_to_cart', $event_catcher,'woocommerce_add_to_cart_callback', 10, 6);
+        $this->loader->add_action('woocommerce_single_product_summary', $event_catcher, 'woocommerce_single_product_summary_callback', 25);
+        $this->loader->add_action('woocommerce_payment_complete', $event_catcher, 'woocommerce_payment_complete_callback');
+        $this->loader->add_filter('pre_get_posts', $event_catcher,'woocommerce_search_callback');
 
         $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
             "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
