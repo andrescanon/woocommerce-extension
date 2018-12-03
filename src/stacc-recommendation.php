@@ -24,6 +24,22 @@ if (!defined('WPINC')) {
 define('PLUGIN_NAME_VERSION', '0.3.0');
 
 /**
+ * The code that runs before the plugin starts.
+ */
+function before_plugin() {
+
+    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+    // Checks whether Woocommerce is enabled
+    if ( ( !is_plugin_active( "woocommerce/woocommerce.php" ) ) ) {
+        deactivate_plugins(plugin_basename( __FILE__ ) );
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * The code that runs during plugin activation.
  */
 function recommender_activate()
@@ -45,7 +61,7 @@ register_activation_hook(__FILE__, 'recommender_activate');
 register_deactivation_hook(__FILE__, 'recommender_deactivate');
 
 /**
- * The core plugin class that is used to define admin-specific hooks
+ * The core plugin class that is used to define hooks
  */
 require plugin_dir_path(__FILE__) . 'includes/class-recommender.php';
 
@@ -60,6 +76,10 @@ require plugin_dir_path(__FILE__) . 'includes/class-recommender.php';
  */
 function run_recommender()
 {
+    // Checks whether everything that's needed for the plugin to work correctly exists.
+    if (!before_plugin())
+        return;
+
     $plugin = new Recommender();
     $plugin->run();
 }

@@ -137,11 +137,12 @@ class Recommender_API
             error_log($event_type);
 		try
 		{
-			// Gets user id and only proceeds if the user is authenticated
-			$user_id = get_current_user_id();
+            // Retrieves a Woocommerce session ID
+            $user_id = WC()->session->get_customer_id();
+            Recommender_WC_Log_Handler::logDebug( "Customer ID: " . $user_id );
 
-			if ($user_id == 0)
-				throw new Exception("user isn't logged in");
+            if ($user_id == null)
+                throw new Exception( "Customer ID was null!" );
 
 			// Checks whether the event given in function arguments exists
 			if (!array_key_exists($event_type, self::$endpoints))

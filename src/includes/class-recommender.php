@@ -150,8 +150,6 @@ class Recommender
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-log-sender.php';
 
-
-
         $this->loader = new Recommender_Loader();
 
     }
