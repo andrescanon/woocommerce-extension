@@ -175,7 +175,8 @@ class Recommender_API
 			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
 			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
 			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			$result = json_decode ( curl_exec( $ch ) );
+			$response = curl_exec( $ch );
+			$result = json_decode ( $response );
 
             if (!curl_errno($ch)){
                 switch ($http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)){
@@ -183,7 +184,7 @@ class Recommender_API
                         if($event_type == 'recs') return $result;
                         return true;
                     default:
-                        throw new Exception("Unexpected code: " . $http_code . "; With result: " . $result);
+                        throw new Exception("Unexpected code: " . $http_code . "; With result: " . $response);
                 }
             } else {
                 throw new Exception(curl_error($ch));
