@@ -197,7 +197,7 @@ class Recommender_API
      * Function to check connection to the API
      *
      * @since 0.2.0
-     * @return bool Can the Recommender connect to the API
+     * @return bool API status
      */
 	public function has_connection(){
 	    try {
