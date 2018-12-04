@@ -53,13 +53,35 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     protected static $version = null;
 
     /**
+     * Minimum log level this handler will process
+     * @since      0.4.0
+     * @access     protected
+     * @var        $threshold Integer minimum log level to handle.
+     */
+    protected $threshold = null;
+
+    /**
+     * @since      0.4.0
+     * @access     protected
+     * @param      $level string of the level to check
+     * @return     true if should be handled, false otherwise
+     */
+    protected function should_handle($level ) {
+        if ( null === $this->threshold ) {
+            return true;
+        }
+        return $this->threshold <= WC_Log_Levels::get_level_severity($level);
+    }
+
+    /**
      * Initialize the class and set its properties.
      *
      * @since      0.3.0
      * @access     private
      * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
+     * @param      $threshold Integer minimum log level to handle.
      */
-    public function __construct($log_size_limit = null)
+    public function __construct($log_size_limit = null, $threshold = 400)
     {
 
         if ( null === $log_size_limit ) {
@@ -69,6 +91,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
         $this->log_size_limit = $log_size_limit;
         self::set_output_file('StaccDefault');
         self::$version = PLUGIN_NAME_VERSION;
+        $this->threshold = $threshold;
 
         add_action( 'plugins_loaded', array( $this, 'write_cached_logs' ) );
     }
@@ -133,16 +156,19 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      */
     private function addTo( $level, $message, $context) {
 
-        $entry = json_encode([
-            "channel" => "WOOCOMMERCE_EXTENSION",
-            "level" => $level,
-            "msg" => $message,
-            "timestamp" => time(),
-            "context" => $context,
-            "extension_version" => self::$version
-        ]);
+        if($this->should_handle($level)){
+            $entry = json_encode([
+                "channel" => "WOOCOMMERCE_EXTENSION",
+                "level" => $level,
+                "msg" => $message,
+                "timestamp" => time(),
+                "context" => $context,
+                "extension_version" => self::$version
+            ]);
 
-        return $this->add( $entry, self::$output_file);
+            return $this->add( $entry, self::$output_file);
+        }
+        return;
     }
 
     // All 8 types of log level methods:
