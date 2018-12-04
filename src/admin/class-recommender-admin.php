@@ -120,11 +120,9 @@ class Recommender_Admin
         if ( isset( $_GET['settings-updated'] ) ) {
             if (Recommender_API::get_instance()->has_connection()) {
                 add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
-                $logurl = get_rest_url($path = 'recommender/v1/sync/logs');
-                $producturl = get_rest_url($path = 'recommender/v1/sync/products');
                 $data = [
-                    'log_sync_url' => $logurl,
-                    'product_sync_url' => $producturl
+                    'log_sync_url' => Recommender_Endpoints::getLogURL(),
+                    'product_sync_url' => Recommender_Endpoints::getProductURL()
                 ];
                 if(Recommender_API::get_instance()->send_post($data, 'creds')){
                     add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
