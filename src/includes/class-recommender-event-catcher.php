@@ -25,6 +25,11 @@ class Recommender_Event_Catcher
     {
         if ( $query->is_search )
         {
+            $session_id = Recommender::get_session_id();
+
+            if ($session_id == null)
+                return $query;
+
             $_chosen_attributes = WC_Query::get_layered_nav_chosen_attributes();
             $filters = [];
             foreach ($_chosen_attributes as $key => $value)
@@ -37,7 +42,7 @@ class Recommender_Event_Catcher
             $search_query = get_search_query(true);
             //$args = $query->query;
             $data = [
-                'stacc_id' => get_current_user_id(),
+                'stacc_id' => $session_id,
                 'query' => $search_query,
                 'filters' => $_SERVER['QUERY_STRING'],
                 'website' => get_site_url(),
@@ -62,13 +67,18 @@ class Recommender_Event_Catcher
      */
     public function woocommerce_add_to_cart_callback( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data )
     {
+        $session_id = Recommender::get_session_id();
+
+        if ($session_id == null)
+            return;
+
         $properties =  [
             'categories' => wc_get_product_category_list($product_id),
             'stock_status' => wc_get_product($product_id)->get_stock_status()
         ];
         $data = [
             'item_id' => $product_id,
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => $session_id,
             'website' => get_site_url(),
             'properties' => $properties
         ];
@@ -82,6 +92,11 @@ class Recommender_Event_Catcher
      */
     public function woocommerce_single_product_summary_callback()
     {
+        $session_id = Recommender::get_session_id();
+
+        if ($session_id == null)
+            return;
+
         global $product;
         $id = $product->get_id();
 
@@ -92,7 +107,7 @@ class Recommender_Event_Catcher
 
         $data = [
             'item_id' => $id,
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => $session_id,
             'website' => get_site_url(),
             'properties' => $properties
         ];
@@ -110,6 +125,11 @@ class Recommender_Event_Catcher
      */
     public function woocommerce_payment_complete_callback( $order_id )
     {
+        $session_id = Recommender::get_session_id();
+
+        if ($session_id == null)
+            return;
+
         $order = wc_get_order( $order_id );
         $items = $order->get_items();
         $item_list = array();
@@ -129,7 +149,7 @@ class Recommender_Event_Catcher
 
 
         $data = [
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => $session_id,
             'item_list' => $item_list,
             'website' => get_site_url(),
             'currency' => $currency,

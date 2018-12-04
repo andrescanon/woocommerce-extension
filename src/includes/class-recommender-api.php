@@ -139,13 +139,6 @@ class Recommender_API
             error_log($event_type);
 		try
 		{
-            // Retrieves a Woocommerce session ID
-            $user_id = WC()->session->get_customer_id();
-            Recommender_WC_Log_Handler::logDebug( "Customer ID: " . $user_id );
-
-            if ($user_id == null)
-                throw new Exception( "Customer ID was null!" );
-
 			// Checks whether the event given in function arguments exists
 			if (!array_key_exists($event_type, self::$endpoints))
 				throw new Exception("Couldn't find an endpoint matching " . $event_type);

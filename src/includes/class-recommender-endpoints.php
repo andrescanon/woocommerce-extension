@@ -85,7 +85,8 @@ class Recommender_Endpoints extends WP_REST_Controller {
      */
     public static function getProductURL(): string
     {
-        return get_rest_url($path = Recommender_Endpoints::getBase() . Recommender_Endpoints::getProductRoute());
+        $url = Recommender_Endpoints::getBase() . Recommender_Endpoints::getProductRoute();
+        return rest_url($url);
     }
 
     /**
@@ -97,7 +98,8 @@ class Recommender_Endpoints extends WP_REST_Controller {
      */
     public static function getLogURL(): string
     {
-        return get_rest_url($path = Recommender_Endpoints::getBase() . Recommender_Endpoints::getLogRoute());
+        $url = Recommender_Endpoints::getBase() . Recommender_Endpoints::getLogRoute();
+        return rest_url($url);
     }
 
     /**

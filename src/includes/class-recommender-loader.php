@@ -129,25 +129,6 @@ class Recommender_Loader
         foreach ($this->actions as $hook) {
             add_action($hook['hook'], array($hook['component'], $hook['callback']), $hook['priority'], $hook['accepted_args']);
         }
-
-        // TODO move this stuff to Recommender
-
-        // Creates a session if one doesn't exist already
-        add_action( 'woocommerce_init', function(){
-            $session = WC()->session;
-
-            if ($session == null)
-                return;
-
-            if ( ! $session->has_session() ) {
-                WC()->session->set_customer_session_cookie( true );
-            }
-        } );
-
-        add_action( 'rest_api_init',  function () {
-            $routes= new Recommender_Endpoints();
-            return $routes->register_routes();
-        });
     }
 
 }

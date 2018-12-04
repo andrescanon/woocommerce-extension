@@ -62,17 +62,14 @@ class Recommender
      */
     public function __construct()
     {
-        if (defined('PLUGIN_NAME_VERSION')) {
-            $this->version = PLUGIN_NAME_VERSION;
-        } else {
-            define('PLUGIN_NAME_VERSION', '0.1.0');
-            $this->version = '0.1.0';
-        }
+        if (!defined('PLUGIN_NAME_VERSION'))
+            define('PLUGIN_NAME_VERSION', '1.0.0');
+
+        $this->version = PLUGIN_NAME_VERSION;
         $this->plugin_name = 'recommender';
 
         $this->load_dependencies();
-        $this->define_admin_hooks();
-        $this->define_event_hooks_filters();
+        $this->define_hooks();
     }
 
     /**
@@ -149,50 +146,71 @@ class Recommender
 
     /**
 
-     * Register all of the hooks related to the admin area functionality
-     * of the plugin.
+     * Register all of the hooks related to the plugin functionality
      *
-     * @since    0.1.0
+     * @since    0.5.0
      * @access   private
      */
-    private function define_admin_hooks()
+    private function define_hooks()
     {
-
+        /**
+         * Hooks for admin areas
+         */
         $plugin_admin = new Recommender_Admin($this->get_plugin_name(), $this->get_version());
 
         $this->loader->add_action('admin_menu', $plugin_admin, 'recommender_admin_menu');
         $this->loader->add_action('admin_init', $plugin_admin, 'recommender_admin_init');
-    }
 
-    /**
-     * Register all of the hooks and filters related to the event catching functionality
-     * of the plugin.
-     *
-     * @since    0.1.0
-     * @access   private
-     */
-    private function define_event_hooks_filters()
-    {
 
+        /**
+         * Hooks for event catching
+         */
         $event_catcher = new Recommender_Event_Catcher();
-        $product_displayer = new Recommender_Product_Displayer();
 
         $this->loader->add_action('woocommerce_add_to_cart', $event_catcher,'woocommerce_add_to_cart_callback', 10, 6);
         $this->loader->add_action('woocommerce_single_product_summary', $event_catcher, 'woocommerce_single_product_summary_callback', 25);
         $this->loader->add_action('woocommerce_payment_complete', $event_catcher, 'woocommerce_payment_complete_callback');
         $this->loader->add_filter('pre_get_posts', $event_catcher,'woocommerce_search_callback');
 
+
+        /**
+         * Hooks for product displaying
+         */
+        $product_displayer = new Recommender_Product_Displayer();
         $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
             "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
             "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"
         );
-
         foreach ($options as $option) {
             if (get_option($option) != false)
             {
                 $this->loader->add_action($option, $product_displayer, 'woocommerce_output_related_products', get_option($option));
             }
         }
+
+
+        /**
+         * Hook for starting the WooCommerce session
+         */
+        add_action( 'woocommerce_init', function(){
+            $session = WC()->session;
+
+            if ($session == null)
+                return;
+
+            if ( ! $session->has_session() ) {
+                WC()->session->set_customer_session_cookie( true );
+            }
+        } );
+
+
+        /**
+         * Hook for creating the WP REST API endpoints
+         */
+        add_action( 'rest_api_init',  function () {
+            $routes= new Recommender_Endpoints();
+            return $routes->register_routes();
+        });
     }
 
     /**
@@ -239,4 +257,20 @@ class Recommender
         return $this->version;
     }
 
+    /**
+     * Retrieve session ID of the customer
+     *
+     * @since     0.5.0
+     * @return    string    The session ID of the customer
+     */
+    public static function get_session_id()
+    {
+        $user_id = WC()->session->get_customer_id();
+        Recommender_WC_Log_Handler::logDebug( "Customer ID: " . $user_id );
+
+        if ($user_id == null)
+            Recommender_WC_Log_Handler::logError("Failed to get Customer ID; result was null");
+
+        return $user_id;
+    }
 }
