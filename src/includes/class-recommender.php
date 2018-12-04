@@ -76,13 +76,7 @@ class Recommender
     }
 
     /**
-     * Load the required dependencies for this plugin.
-     *
-     * Include the following file that make up the plugin:
-     *
-     * - Recommender_Loader. Orchestrates the hooks of the plugin.
-     * - Recommender_Admin. Defines all hooks for the admin area.
-     * - Event_Catcher. Defines all hooks for catching events.
+     * Load the required dependencies for this plugins
      *
      * Create an instance of the loader which will be used to register the hooks
      * with WordPress.
@@ -140,20 +134,21 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-product-displayer.php';
 
         /**
-         * The class responsible for syncing the stores catalog.
+         * The class responsible for syncing
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-syncer.php';
 
         /**
-         * The class responsible for sending the logs
+         * The class responsible for custom Wordpress REST API endpoints
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-log-sender.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-endpoints.php';
 
         $this->loader = new Recommender_Loader();
 
     }
 
     /**
+
      * Register all of the hooks related to the admin area functionality
      * of the plugin.
      *
