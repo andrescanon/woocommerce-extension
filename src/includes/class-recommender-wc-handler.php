@@ -61,93 +61,6 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     protected $threshold = null;
 
     /**
-     * Log Levels
-     * @since      0.4.0
-     * @access     protected
-     *
-     * Description of levels:
-     *     'EMERGENCY': System is unusable.
-     *     'ALERT': Action must be taken immediately.
-     *     'CRITICAL': Critical conditions.
-     *     'ERROR': Error conditions.
-     *     'WARNING': Warning conditions.
-     *     'NOTICE': Normal but significant condition.
-     *     'INFO': Informational messages.
-     *     'DEBUG': Debug-level messages.
-     */
-    const EMERGENCY = 'EMERGENCY';
-    const ALERT     = 'ALERT';
-    const CRITICAL  = 'CRITICAL';
-    const ERROR     = 'ERROR';
-    const WARNING   = 'WARNING';
-    const NOTICE    = 'NOTICE';
-    const INFO      = 'INFO';
-    const DEBUG     = 'DEBUG';
-
-    /**
-     * Level strings to integers.
-     * @since      0.4.0
-     * @access     protected
-     * @var        array of level to integer
-     */
-    protected $level_to_severity = array(
-        self::EMERGENCY => 800,
-        self::ALERT     => 700,
-        self::CRITICAL  => 600,
-        self::ERROR     => 500,
-        self::WARNING   => 400,
-        self::NOTICE    => 300,
-        self::INFO      => 200,
-        self::DEBUG     => 100,
-    );
-
-    /**
-     * Integers to level strings.
-     * @since      0.4.0
-     * @access     protected
-     * @var        array integer to level
-     */
-    protected $severity_to_level = array(
-        800 => self::EMERGENCY,
-        700 => self::ALERT,
-        600 => self::CRITICAL,
-        500 => self::ERROR,
-        400 => self::WARNING,
-        300 => self::NOTICE,
-        200 => self::INFO,
-        100 => self::DEBUG,
-    );
-
-    /**
-     * @since      0.4.0
-     * @access     protected
-     * @param      $level string to get severity of
-     * @return     integer representing level, 0 if level not found
-     */
-    protected function get_level_severity($level ) {
-        if (array_key_exists( $level, $this->level_to_severity )) {
-            $severity = $this->level_to_severity[ $level ];
-        } else {
-            $severity = 0;
-        }
-        return $severity;
-    }
-
-    /**
-     * @since      0.4.0
-     * @access     protected
-     * @param      $severity integer to get integer from
-     * @return     string representing level, false if not found
-     */
-    protected function get_severity_level($severity ) {
-        if ( array_key_exists( $severity, $this->severity_to_level ) ) {
-            return $this->severity_to_level[ $severity ];
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * @since      0.4.0
      * @access     protected
      * @param      $level string of the level to check
@@ -157,7 +70,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
         if ( null === $this->threshold ) {
             return true;
         }
-        return $this->threshold <= $this->get_level_severity($level);
+        return $this->threshold <= WC_Log_Levels::get_level_severity($level);
     }
 
     /**
