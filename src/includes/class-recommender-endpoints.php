@@ -14,26 +14,114 @@
 class Recommender_Endpoints extends WP_REST_Controller {
 
     /**
+     * Stores the base part of the endpoint
+     *
+     * @since    0.4.5
+     * @access   private
+     * @var      string $namespace Stores the base part of the endpoint
+     */
+    private static $base = 'recommender/v1';
+
+    /**
+     * Stores the route part of the product sync endpoint
+     *
+     * @since    0.4.5
+     * @access   private
+     * @var      string $product_sync_endpoint Stores the route value for products
+     */
+    private static $product_route = '/sync/products';
+
+    /**
+     * Stores the route part of the log sync endpoint
+     *
+     * @since    0.4.5
+     * @access   private
+     * @var      string $log_sync_endpoint Stores the route value for logs
+     */
+    private static $log_route = '/sync/logs';
+
+    /**
+     * Getter for static variable $base
+     *
+     * @since  0.4.5
+     * @access public
+     * @return string
+     */
+    public static function getBase(): string
+    {
+        return self::$base;
+    }
+
+    /**
+     * Getter for static variable $product_route
+     *
+     * @since  0.4.5
+     * @access public
+     * @return string
+     */
+    public static function getProductRoute(): string
+    {
+        return self::$product_route;
+    }
+
+    /**
+     * Getter for static variable $log_route
+     *
+     * @since  0.4.5
+     * @access public
+     * @return string
+     */
+    public static function getLogRoute(): string
+    {
+        return self::$log_route;
+    }
+
+    /**
+     * Get REST URL for products
+     *
+     * @since  0.4.5
+     * @access public
+     * @return string
+     */
+    public static function getProductURL(): string
+    {
+        return get_rest_url($path = Recommender_Endpoints::getBase() . Recommender_Endpoints::getProductRoute());
+    }
+
+    /**
+     * Get REST URL for logs
+     *
+     * @since  0.4.5
+     * @access public
+     * @return string
+     */
+    public static function getLogURL(): string
+    {
+        return get_rest_url($path = Recommender_Endpoints::getBase() . Recommender_Endpoints::getLogRoute());
+    }
+
+    /**
      * Register the routes for the objects of the controller.
      *
      * @since 0.4.0
      */
     public function register_routes()
     {
-        $version = '1';
-        $namespace = 'recommender/v' . $version;
-        $base = 'sync';
+        $base = Recommender_Endpoints::getBase();
+        $product_route = Recommender_Endpoints::getProductRoute();
+        $log_route = Recommender_Endpoints::getLogRoute();
 
-        register_rest_route( $namespace, '/' . $base . '/' . 'products', array(
+        register_rest_route( $base, $product_route, array(
             'methods' => 'GET',
             'callback' => array( $this, 'sync_products' ),
         ) );
 
-        register_rest_route( $namespace, '/' . $base . '/' . 'logs', array(
+        register_rest_route( $base, $log_route, array(
             'methods' => 'GET',
             'callback' => array( $this, 'sync_logs' ),
         ) );
     }
+
     /**
      * Start the process of syncing products
      *

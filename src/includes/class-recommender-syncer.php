@@ -46,7 +46,7 @@ class Recommender_Syncer
      *
      * @since      0.4.0
      */
-    public function __construct()
+    private function __construct()
     {}
 
     /**
