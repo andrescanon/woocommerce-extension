@@ -127,10 +127,10 @@ class Recommender_Admin
                     'product_sync_url' => $producturl
                 ];
                 if(Recommender_API::get_instance()->send_post($data, 'creds')){
-                    add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
+                    add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
                     Recommender_WC_Log_Handler::logDebug('Settings Saved');
                 } else {
-                    add_settings_error('recommender_messages', 'recommender_message', __('Settings Not Saved', 'recommender'), 'error');
+                    add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Settings Not Saved - Check your Shop ID and API Key', 'recommender'), 'error');
                     update_option('shop_id', '');
                     update_option('api_key', '');
                     Recommender_WC_Log_Handler::logError('Validation Error - Settings not saved');
