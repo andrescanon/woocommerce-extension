@@ -101,7 +101,7 @@ class Recommender_Event_Catcher
         $id = $product->get_id();
 
         $properties =  [
-            'categories' => wc_get_product_category_list($id),
+            'categories' => strip_tags(wc_get_product_category_list($id)),
             'stock_status' => $product->get_stock_status()
         ];
 

@@ -128,13 +128,6 @@ class Recommender_API
 	 */
 	public function send_post($data, $event_type, $timeout = 5000)
 	{
-        //WP internal logging for incoming events.
-        // Needs in wp-config.php
-        // define('WP_DEBUG', true);
-        // define('WP_DEBUG_LOG', true);
-        // The log will be in wp-content
-        // These logs are used for Selenium tests
-
         if ($event_type != 'recs')
             error_log($event_type);
 		try
@@ -197,7 +190,7 @@ class Recommender_API
      * Function to check connection to the API
      *
      * @since 0.2.0
-     * @return bool API status
+     * @return bool Can the Recommender connect to the API
      */
 	public function has_connection(){
 	    try {

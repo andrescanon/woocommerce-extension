@@ -41,6 +41,52 @@ class Recommender_Endpoints extends WP_REST_Controller {
     private static $log_route = '/sync/logs';
 
     /**
+     * Register the routes for the objects of the controller.
+     *
+     * @since 0.4.0
+     */
+    public function register_routes()
+    {
+        $base = Recommender_Endpoints::getBase();
+        $product_route = Recommender_Endpoints::getProductRoute();
+        $log_route = Recommender_Endpoints::getLogRoute();
+
+        register_rest_route( $base, $product_route, array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'sync_products' ),
+        ) );
+
+        register_rest_route( $base, $log_route, array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'sync_logs' ),
+        ) );
+    }
+
+    /**
+     * Start the process of syncing products
+     *
+     * @since 0.4.0
+     * @param WP_REST_Request $request Full data about the request.
+     * @return WP_REST_Response
+     */
+    public function sync_products( $request ) {
+        //Recommender_Syncer::get_instance()->sync_catalog();
+        return new WP_REST_Response( array(), 200 );
+    }
+
+    /**
+     * Start the process of syncing logs
+     *
+     * @since 0.4.0
+     * @param WP_REST_Request $request Full data about the request.
+     * @return WP_REST_Response
+     */
+    public function sync_logs( $request ) {
+        //Recommender_Syncer::get_instance()->sync_logs();
+        return new WP_REST_Response( array(), 200 );
+    }
+
+    /**
      * Getter for static variable $base
      *
      * @since  0.4.5
@@ -100,51 +146,5 @@ class Recommender_Endpoints extends WP_REST_Controller {
     {
         $url = Recommender_Endpoints::getBase() . Recommender_Endpoints::getLogRoute();
         return rest_url($url);
-    }
-
-    /**
-     * Register the routes for the objects of the controller.
-     *
-     * @since 0.4.0
-     */
-    public function register_routes()
-    {
-        $base = Recommender_Endpoints::getBase();
-        $product_route = Recommender_Endpoints::getProductRoute();
-        $log_route = Recommender_Endpoints::getLogRoute();
-
-        register_rest_route( $base, $product_route, array(
-            'methods' => 'GET',
-            'callback' => array( $this, 'sync_products' ),
-        ) );
-
-        register_rest_route( $base, $log_route, array(
-            'methods' => 'GET',
-            'callback' => array( $this, 'sync_logs' ),
-        ) );
-    }
-
-    /**
-     * Start the process of syncing products
-     *
-     * @since 0.4.0
-     * @param WP_REST_Request $request Full data about the request.
-     * @return WP_REST_Response
-     */
-    public function sync_products( $request ) {
-        //Recommender_Syncer::get_instance()->sync_catalog();
-        return new WP_REST_Response( array(), 200 );
-    }
-
-    /**
-     * Start the process of syncing logs
-     *
-     * @since 0.4.0
-     * @param WP_REST_Request $request Full data about the request.
-     * @return WP_REST_Response
-     */
-    public function sync_logs( $request ) {
-        //Recommender_Syncer::get_instance()->sync_logs();
-        return new WP_REST_Response( array(), 200 );
     }
 }
