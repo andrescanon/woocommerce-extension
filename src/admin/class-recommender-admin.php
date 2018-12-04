@@ -57,8 +57,8 @@ class Recommender_Admin
     {
 	    if (!is_plugin_active('woocommerce/woocommerce.php'))
 		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
-	    register_setting('recommender_options', 'shop_id', array('sanitize_callback'  => array( $this, 'recommender_option_validation' )));
-	    register_setting('recommender_options', 'api_key', array('sanitize_callback'  => array( $this, 'recommender_option_validation' )));
+	    register_setting('recommender_options', 'shop_id', array('sanitize_callback'  => array( $this, 'recommender_option_sanitizer' )));
+	    register_setting('recommender_options', 'api_key', array('sanitize_callback'  => array( $this, 'recommender_option_sanitizer' )));
         register_setting('box_options', 'woocommerce_before_single_product_summary');
         register_setting('box_options', 'woocommerce_after_single_product_summary');
         register_setting('box_options', 'woocommerce_before_shop_loop');
@@ -118,19 +118,30 @@ class Recommender_Admin
         }
 
         if ( isset( $_GET['settings-updated'] ) ) {
-            if(!get_settings_errors('errorOnValidation')) {
-                if (Recommender_API::get_instance()->has_connection()) {
-                    add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
+            if (Recommender_API::get_instance()->has_connection()) {
+                add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
+                $logurl = get_rest_url($path = 'recommender/v1/sync/logs');
+                $producturl = get_rest_url($path = 'recommender/v1/sync/products');
+                $data = [
+                    'log_sync_url' => $logurl,
+                    'product_sync_url' => $producturl
+                ];
+                if(Recommender_API::get_instance()->send_post($data, 'creds')){
+                    add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
+                    Recommender_WC_Log_Handler::logDebug('Settings Saved');
                 } else {
-                    add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline', 'recommender'), 'updated');
+                    add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Settings Not Saved - Check your Shop ID and API Key', 'recommender'), 'error');
+                    update_option('shop_id', '');
+                    update_option('api_key', '');
+                    Recommender_WC_Log_Handler::logError('Validation Error - Settings not saved');
                 }
-                add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved', 'recommender'), 'updated');
-                settings_errors('recommender_messages');
-                Recommender_WC_Log_Handler::logDebug('Settings Saved');
             } else {
-                settings_errors('errorOnValidation');
-                Recommender_WC_Log_Handler::logError('Validation Error');
+                add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline - Settings Not Saved', 'recommender'), 'error');
+                update_option('shop_id', '');
+                update_option('api_key', '');
+                Recommender_WC_Log_Handler::logWarning('API Offline - Settings not saved');
             }
+            settings_errors('recommender_messages');
         }
 
         ?>
@@ -258,21 +269,13 @@ class Recommender_Admin
     }
 
     /**
-     * Function to check if the input consists of only alphanumeric characters
+     * Function to sanitize the text field
      *
-     * @param $data Input data that is to be validated
-     * @return mixed Valid data
+     * @param $data Input data that is to be sanitized
+     * @return mixed Sanitized data
      */
-    public function recommender_option_validation($data)
+    public function recommender_option_sanitizer($data)
     {
-        if (ctype_alnum($data)){
-            return sanitize_text_field($data);
-        } else {
-            add_settings_error(
-                'errorOnValidation',
-                'validationError',
-                'This field must contain only numbers and letters, and must not be empty.',
-                'error');
-        }
+        return sanitize_text_field($data);
     }
 }

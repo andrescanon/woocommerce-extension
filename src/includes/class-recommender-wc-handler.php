@@ -53,6 +53,39 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     protected static $version = null;
 
     /**
+     * Initialize the class and set its properties.
+     *
+     * @since      0.3.0
+     * @access     private
+     * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
+     */
+    public function __construct($log_size_limit = null)
+    {
+
+        if ( null === $log_size_limit ) {
+            $log_size_limit = 5 * 1024 * 1024;
+        }
+
+        $this->log_size_limit = $log_size_limit;
+        self::set_output_file('StaccDefault');
+        self::$version = PLUGIN_NAME_VERSION;
+
+        add_action( 'plugins_loaded', array( $this, 'write_cached_logs' ) );
+    }
+
+    /**
+     * @since      0.3.0
+     * @access     public
+     * @return     Recommender_WC_Log_Handler instance
+     */
+    public static function get_instance()
+    {
+        if (self::$instance == null)
+            self::$instance = new Recommender_WC_Log_Handler();
+        return self::$instance;
+    }
+
+    /**
      * Sets the output file
      *
      * @since      0.3.0
@@ -87,38 +120,6 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
             self::logWarning("Making copy of old log file failed!");
         }
 
-    }
-    
-    /**
-     * Initialize the class and set its properties.
-     *
-     * @since      0.3.0
-     * @access     public
-     * @param      $version string plugin version
-     * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
-     */
-    public function __construct($version , $log_size_limit = null) {
-
-        if ( null === $log_size_limit ) {
-            $log_size_limit = 5 * 1024 * 1024;
-        }
-
-        $this->log_size_limit = $log_size_limit;
-        self::set_output_file('StaccDefault');
-        self::$version = $version;
-        self::$instance = $this;
-
-        add_action( 'plugins_loaded', array( $this, 'write_cached_logs' ) );
-    }
-
-    /**
-     * @since      0.3.0
-     * @access     public
-     * @return     Recommender_WC_Log_Handler instance
-     */
-    public static function get_instance()
-    {
-        return self::$instance;
     }
 
     /**
