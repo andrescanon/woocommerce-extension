@@ -63,7 +63,8 @@ class Recommender_API
 		'search' => '/send_search',
         'recs' => '/get_recs',
         'logs' => '/send_logs',
-        'catalog' => '/catalog_sync'
+        'catalog' => '/catalog_sync',
+        'creds' => '/check_credentials'
 	];
 
 	/**
@@ -80,7 +81,8 @@ class Recommender_API
 		'search' => ["stacc_id", "query", "filters", "website", "properties"],
 		'recs' => ["item_id", "stacc_id", "block_id", "website", "properties"],
         'logs' => ["logs"],
-        'catalog' => ["bulk", "properties"]
+        'catalog' => ["bulk", "properties"],
+        'creds' => ["log_sync_url", "product_sync_url"]
 	];
 
 	/**
