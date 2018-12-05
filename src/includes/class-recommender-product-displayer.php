@@ -97,12 +97,11 @@ class Recommender_Product_Displayer
             'properties' => []
         ];
 
-        $received_recommendations = $this->api->send_post($data_to_send, 'recs' );
-        if($received_recommendations == false || $received_recommendations == []){
+        $received_ids = $this->api->send_post($data_to_send, 'recs' );
+        if($received_ids == false || $received_ids == []){
             Recommender_WC_Log_Handler::logWarning('Recommender_Product_Displayer didnt recieve products from API');
             return;
         }
-        $received_ids = $received_recommendations->{"items"};
         Recommender_WC_Log_Handler::logDebug('Recommended product IDs received from API: ' . json_encode($received_ids));
         $this->set_products_for_display($received_ids);
         add_filter( 'woocommerce_related_products', array( $this, 'display_my_related_products') );

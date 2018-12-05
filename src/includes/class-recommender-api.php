@@ -182,10 +182,10 @@ class Recommender_API extends WP_Async_Request
             if (!is_wp_error($response)){
                 switch ($http_code = $response['response']['code']){
                     case 200:
-                        if($event_type == 'recs') return $response['body'];
+                        if($event_type == 'recs') return json_decode($response['body'])->items;
                         return true;
                     default:
-                        throw new Exception("Event type ".$event_type." with data_json: ".$data_json." gave an unexpected code: " . $http_code . " with result: " . $response);
+                        throw new Exception("Event type ".$event_type." with data_json: ".$data_json." gave an unexpected code: " . $http_code . " with message: " . $response['response']['message']);
                 }
             } else {
                 throw new Exception($response);
