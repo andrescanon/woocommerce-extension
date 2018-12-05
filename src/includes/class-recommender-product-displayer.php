@@ -43,6 +43,10 @@ class Recommender_Product_Displayer
      * @since 0.3.0
      */
     public function woocommerce_output_related_products(){
+        if(get_option( 'cred_check_failed', $default = true )) {
+            return;
+        }
+
         global $product;
         
         //if cant get product, takes first product from product list
