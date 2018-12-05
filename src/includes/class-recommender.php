@@ -146,7 +146,6 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-endpoints.php';
 
         $this->loader = new Recommender_Loader();
-
     }
 
     /**
@@ -166,30 +165,34 @@ class Recommender
         $this->loader->add_action('admin_menu', $plugin_admin, 'recommender_admin_menu');
         $this->loader->add_action('admin_init', $plugin_admin, 'recommender_admin_init');
 
-
         /**
          * Hooks for event catching
          */
         $event_catcher = new Recommender_Event_Catcher(new Recommender_API());
 
+        $this->loader->add_action('template_redirect', $event_catcher, 'woocommerce_remove_default_callback');
         $this->loader->add_action('woocommerce_add_to_cart', $event_catcher,'woocommerce_add_to_cart_callback', 10, 6);
         $this->loader->add_action('woocommerce_single_product_summary', $event_catcher, 'woocommerce_single_product_summary_callback', 25);
         $this->loader->add_action('woocommerce_payment_complete', $event_catcher, 'woocommerce_payment_complete_callback');
         $this->loader->add_filter('pre_get_posts', $event_catcher,'woocommerce_search_callback');
 
-
         /**
          * Hooks for product displaying
          */
-        $product_displayer = new Recommender_Product_Displayer(new Recommender_API());
-        $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
-            "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
-            "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"
+
+        $options = array("woocommerce_before_single_product_summary"=>1, "woocommerce_after_single_product_summary"=>2,
+            "woocommerce_before_shop_loop"=>3, "woocommerce_after_shop_loop"=>4, "woocommerce_before_cart"=>5,
+            "woocommerce_after_cart_table"=>6, "woocommerce_after_cart_totals"=>7,"woocommerce_after_cart"=>8
+
         );
-        foreach ($options as $option) {
-            if (get_option($option) != false)
-            {
-                $this->loader->add_action($option, $product_displayer, 'woocommerce_output_related_products', get_option($option));
+        $displayers = array();
+
+        foreach ($options as $option => $option_id) {
+            if (get_option($option) != false) {
+                $displayer = new Recommender_Product_Displayer(new Recommender_API());
+                $displayers[$option_id] = $displayer;
+                $displayer->set_box_properties($option_id, $option);
+                $this->loader->add_action($option, $displayer, 'woocommerce_output_related_products', get_option($option));
             }
         }
 

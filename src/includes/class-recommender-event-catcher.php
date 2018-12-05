@@ -132,8 +132,6 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        if (get_option('disable_default_box') == 1)
-            remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
         $this->api->send_post($data, 'view');
     }
@@ -179,5 +177,12 @@ class Recommender_Event_Catcher
         $this->api->send_post($data, 'purchase');
     }
 
-
+    /**
+     * Callback for removing the default WooCommerce related products
+     *
+     * @since 0.5.0
+     */
+    function woocommerce_remove_default_callback() {
+        remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+    }
 }
