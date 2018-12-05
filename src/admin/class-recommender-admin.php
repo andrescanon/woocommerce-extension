@@ -129,16 +129,13 @@ class Recommender_Admin
                     update_option( 'cred_check_failed', false);
                     Recommender_WC_Log_Handler::logDebug('Settings Saved');
                 } else {
-                    add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Settings Not Saved - Check your Shop ID and API Key', 'recommender'), 'error');
-                    update_option('shop_id', '');
-                    update_option('api_key', '');
+                    add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Plugin Set Up Failed -Check your Shop ID and API Key', 'recommender'), 'error');
                     update_option( 'cred_check_failed', true);
-                    Recommender_WC_Log_Handler::logError('Validation Error - Settings not saved');
+                    Recommender_WC_Log_Handler::logError('Validation Error');
                 }
             } else {
-                add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline - Settings Not Saved', 'recommender'), 'error');
-                update_option('shop_id', '');
-                update_option('api_key', '');
+                add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline - Plugin Set Up Failed', 'recommender'), 'error');
+                update_option( 'cred_check_failed', true);
                 Recommender_WC_Log_Handler::logWarning('API Offline - Settings not saved');
             }
             settings_errors('recommender_messages');

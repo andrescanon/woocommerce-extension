@@ -67,7 +67,6 @@ class Recommender
 
         $this->version = PLUGIN_NAME_VERSION;
         $this->plugin_name = 'recommender';
-        add_option( 'cred_check_failed', true);
 
         $this->load_dependencies();
         $this->define_hooks();

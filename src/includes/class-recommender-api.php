@@ -177,7 +177,7 @@ class Recommender_API
                         if($event_type == 'recs') return $result;
                         return true;
                     default:
-                        throw new Exception("Unexpected code: " . $http_code . "; With result: " . $response);
+                        throw new Exception("Event type ".$event_type." with data_string: ".$data_string." gave an unexpected code: " . $http_code . " with result: " . $response);
                 }
             } else {
                 throw new Exception(curl_error($ch));
