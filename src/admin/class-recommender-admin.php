@@ -126,11 +126,13 @@ class Recommender_Admin
                 ];
                 if(Recommender_API::get_instance()->send_post($data, 'creds')){
                     add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
+                    update_option( 'cred_check_failed', false);
                     Recommender_WC_Log_Handler::logDebug('Settings Saved');
                 } else {
                     add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Settings Not Saved - Check your Shop ID and API Key', 'recommender'), 'error');
                     update_option('shop_id', '');
                     update_option('api_key', '');
+                    update_option( 'cred_check_failed', true);
                     Recommender_WC_Log_Handler::logError('Validation Error - Settings not saved');
                 }
             } else {

@@ -73,7 +73,7 @@ class Recommender_Product_Displayer
         ];
 
         $received_recommendations = Recommender_API::get_instance()->send_post($data_to_send, 'recs' );
-        if($received_recommendations == []){
+        if($received_recommendations == false || $received_recommendations == []){
             Recommender_WC_Log_Handler::logWarning('Recommender_Product_Displayer didnt recieve products from API');
             return;
         }

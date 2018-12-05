@@ -130,6 +130,11 @@ class Recommender_API
 	{
         if ($event_type != 'recs')
             error_log($event_type);
+        
+	    if($event_type != 'creds' && get_option( 'cred_check_failed', $default = true )){
+	        return false;
+        }
+
 		try
 		{
 			// Checks whether the event given in function arguments exists
@@ -181,7 +186,6 @@ class Recommender_API
 		catch (Exception $exception)
 		{
             Recommender_WC_Log_Handler::logError('POST send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            if($event_type == 'recs') return json_decode(json_encode(array()), FALSE);
             return false;
 		}
 	}
