@@ -55,10 +55,10 @@ class Recommender_Admin
      */
     public function recommender_admin_init()
     {
-	    if (!is_plugin_active('woocommerce/woocommerce.php'))
-		    deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
-	    register_setting('recommender_options', 'shop_id', array('sanitize_callback'  => array( $this, 'recommender_option_sanitizer' )));
-	    register_setting('recommender_options', 'api_key', array('sanitize_callback'  => array( $this, 'recommender_option_sanitizer' )));
+        if (!is_plugin_active('woocommerce/woocommerce.php'))
+            deactivate_plugins('woocommerce-extension/stacc-recommendation.php');
+        register_setting('recommender_options', 'shop_id', array('sanitize_callback'  => array( $this, 'recommender_option_sanitizer' )));
+        register_setting('recommender_options', 'api_key', array('sanitize_callback'  => array( $this, 'recommender_option_sanitizer' )));
         register_setting('box_options', 'woocommerce_before_single_product_summary');
         register_setting('box_options', 'woocommerce_after_single_product_summary');
         register_setting('box_options', 'woocommerce_before_shop_loop');
@@ -67,7 +67,22 @@ class Recommender_Admin
         register_setting('box_options', 'woocommerce_after_cart_table');
         register_setting('box_options', 'woocommerce_after_cart_totals');
         register_setting('box_options', 'woocommerce_after_cart');
-        register_setting('box_options', 'disable_default_box');
+        register_setting('box_options', 'woocommerce_before_single_product_summary_rows');
+        register_setting('box_options', 'woocommerce_before_single_product_summary_columns');
+        register_setting('box_options', 'woocommerce_after_single_product_summary_rows');
+        register_setting('box_options', 'woocommerce_after_single_product_summary_columns');
+        register_setting('box_options', 'woocommerce_before_shop_loop_rows');
+        register_setting('box_options', 'woocommerce_before_shop_loop_columns');
+        register_setting('box_options', 'woocommerce_after_shop_loop_rows');
+        register_setting('box_options', 'woocommerce_after_shop_loop_columns');
+        register_setting('box_options', 'woocommerce_before_cart_rows');
+        register_setting('box_options', 'woocommerce_before_cart_columns');
+        register_setting('box_options', 'woocommerce_after_cart_table_rows');
+        register_setting('box_options', 'woocommerce_after_cart_table_columns');
+        register_setting('box_options', 'woocommerce_after_cart_totals_rows');
+        register_setting('box_options', 'woocommerce_after_cart_totals_columns');
+        register_setting('box_options', 'woocommerce_after_cart_rows');
+        register_setting('box_options', 'woocommerce_after_cart_columns');
     }
 
     /**
@@ -105,7 +120,7 @@ class Recommender_Admin
         else
             $this->box_preferences_page();
     }
-  
+
     /**
      * Creates the page for API auth settings
      *
@@ -213,48 +228,95 @@ class Recommender_Admin
                     <tr valign="top">
                         <th scope="row">Extension Version</th>
                         <td><?php echo $this->version; ?></td>
-                        <th scope="row">Disable default box</th>
-                        <td><input type="checkbox" name="disable_default_box" value="1" <?php checked( 1 == get_option( 'disable_default_box' ) ); ?>"/></td>
                     </tr>
                     <tr valign="center">
                         <th scope="row" style="font-size: large">Single product view</th>
-                        <th scope="row"></th>
-                        <th scope="row" style="font-size: large">Multiple product view</th>
-                        <th scope="row"></th>
-                        <th scope="row" style="font-size: large">Shopping cart</th>
-                        <th scope="row"></th>
                     </tr>
                     <tr valign="top">
+                        <th>ID</th>
+                        <th>Box placement</th>
+                        <th>Enabled</th>
+                        <th>Products</th>
+                        <th>Columns</th>
+                    </tr>
+                    <tr valign="top">
+                        <th>1</th>
                         <th scope="row">Before product summary</th>
-                        <td><input type="checkbox" name="woocommerce_before_single_product_summary" value="10" <?php checked( 10 == get_option( 'woocommerce_before_single_product_summary' ) ); ?>"/></td>
-                        <th scope="row">Before products</th>
-                        <td><input type="checkbox" name="woocommerce_before_shop_loop" value="20" <?php checked( 20 == get_option( 'woocommerce_before_shop_loop' ) ); ?>"/></td>
-                        <th scope="row">Before cart</th>
-                        <td><input type="checkbox" name="woocommerce_before_cart" value="10" <?php checked( 10 == get_option( 'woocommerce_before_cart' ) ); ?>"/></td>
+                        <th><input type="checkbox" name="woocommerce_before_single_product_summary" value="10" <?php checked( 10 == get_option( 'woocommerce_before_single_product_summary' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_before_single_product_summary_rows" value="<?php echo esc_attr(get_option('woocommerce_before_single_product_summary_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_before_single_product_summary_columns" value="<?php echo esc_attr(get_option('woocommerce_before_single_product_summary_columns', $default = 2)); ?>" min="1" max="10" </th>
+                        <th></th>
+                        <th></th>
                     </tr>
                     <tr valign="top">
+                        <th>2</th>
                         <th scope="row">After product summary</th>
-                        <td><input type="checkbox" name="woocommerce_after_single_product_summary" value="25" <?php checked( 25 == get_option( 'woocommerce_after_single_product_summary' ) ); ?>"/></td>
+                        <th><input type="checkbox" name="woocommerce_after_single_product_summary" value="25" <?php checked( 25 == get_option( 'woocommerce_after_single_product_summary' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_after_single_product_summary_rows" value="<?php echo esc_attr(get_option('woocommerce_after_single_product_summary_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_after_single_product_summary_columns" value="<?php echo esc_attr(get_option('woocommerce_after_single_product_summary_columns', $default = 2)); ?>" min="1" max="10" </th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row" style="font-size: large">Multiple product view</th>
+                    </tr>
+                    <tr valign="top">
+                        <th>ID</th>
+                        <th>Box placement</th>
+                        <th>Enabled</th>
+                        <th>Products</th>
+                        <th>Columns</th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">3</th>
+                        <th scope="row">Before products</th>
+                        <th><input type="checkbox" name="woocommerce_before_shop_loop" value="10" <?php checked( 10 == get_option( 'woocommerce_before_shop_loop' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_before_shop_loop_rows" value="<?php echo esc_attr(get_option('woocommerce_before_shop_loop_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_before_shop_loop_columns" value="<?php echo esc_attr(get_option('woocommerce_before_shop_loop_columns', $default = 2)); ?>" min="1" max="10" </th>
+                    </tr>
+                    <tr valign="top">
+                        <th>4</th>
                         <th scope="row">After products</th>
-                        <td><input type="checkbox" name="woocommerce_after_shop_loop" value="10" <?php checked( 10 == get_option( 'woocommerce_after_shop_loop' ) ); ?>"/></td>
+                        <th><input type="checkbox" name="woocommerce_after_shop_loop" value="10" <?php checked( 10 == get_option( 'woocommerce_after_shop_loop' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_after_shop_loop_rows" value="<?php echo esc_attr(get_option('woocommerce_after_shop_loop_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_after_shop_loop_columns" value="<?php echo esc_attr(get_option('woocommerce_after_shop_loop_columns', $default = 2)); ?>" min="1" max="10" </th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row" style="font-size: large">Shopping cart</th>
+                    </tr>
+                    <tr valign="top">
+                        <th>ID</th>
+                        <th>Box placement</th>
+                        <th>Enabled</th>
+                        <th>Products</th>
+                        <th>Columns</th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">5</th>
+                        <th scope="row">Before cart</th>
+                        <th><input type="checkbox" name="woocommerce_before_cart" value="10" <?php checked( 10 == get_option( 'woocommerce_before_cart' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_before_cart_rows" value="<?php echo esc_attr(get_option('woocommerce_before_cart_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_before_cart_columns" value="<?php echo esc_attr(get_option('woocommerce_before_cart_columns', $default = 2)); ?>" min="1" max="10" </th>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">6</th>
                         <th scope="row">After cart table</th>
-                        <td><input type="checkbox" name="woocommerce_after_cart_table" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart_table' ) ); ?>"/></td>
+                        <th><input type="checkbox" name="woocommerce_after_cart_table" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart_table' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_after_cart_table_rows" value="<?php echo esc_attr(get_option('woocommerce_after_cart_table_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_after_cart_table_columns" value="<?php echo esc_attr(get_option('woocommerce_after_cart_table_columns', $default = 2)); ?>" min="1" max="10" </th>
                     </tr>
                     <tr valign="top">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <th scope="row">7</th>
                         <th scope="row">After cart totals</th>
-                        <td><input type="checkbox" name="woocommerce_after_cart_totals" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart_totals' ) ); ?>"/></td>
+                        <th><input type="checkbox" name="woocommerce_after_cart_totals" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart_totals' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_after_cart_totals_rows" value="<?php echo esc_attr(get_option('woocommerce_after_cart_totals_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_after_cart_totals_columns" value="<?php echo esc_attr(get_option('woocommerce_after_cart_totals_columns', $default = 2)); ?>" min="1" max="10" </th>
                     </tr>
                     <tr valign="top">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <th scope="row">8</th>
                         <th scope="row">After cart</th>
-                        <td><input type="checkbox" name="woocommerce_after_cart" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart' ) ); ?>"/></td>
+                        <th><input type="checkbox" name="woocommerce_after_cart" value="10" <?php checked( 10 == get_option( 'woocommerce_after_cart' ) ); ?>"/></th>
+                        <th scope="row"><input type="number" name="woocommerce_after_cart_rows" value="<?php echo esc_attr(get_option('woocommerce_after_cart_rows', $default = 2)); ?>" min="1" max="10" </th>
+                        <th scope="row"><input type="number" name="woocommerce_after_cart_columns" value="<?php echo esc_attr(get_option('woocommerce_after_cart_columns', $default = 2)); ?>" min="1" max="10" </th>
+                    </tr>
                 </table>
                 <?php
                 // output save settings button
