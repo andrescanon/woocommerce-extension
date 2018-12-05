@@ -91,7 +91,7 @@ class Recommender_Product_Displayer
 
         $data_to_send = [
             'item_id' => $product->get_id(),
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => Recommender::get_session_id(),
             'block_id' => '0',
             'website' => get_site_url(),
             'properties' => []
