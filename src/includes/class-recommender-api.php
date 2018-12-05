@@ -188,7 +188,7 @@ class Recommender_API extends WP_Async_Request
                         throw new Exception("Event type ".$event_type." with data_json: ".$data_json." gave an unexpected code: " . $http_code . " with message: " . $response['response']['message']);
                 }
             } else {
-                throw new Exception($response);
+                throw new Exception(json_encode($response));
             }
 		}
 		catch (Exception $exception)
