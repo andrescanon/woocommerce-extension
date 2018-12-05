@@ -100,6 +100,11 @@ class Recommender
         require_once WP_PLUGIN_DIR . '/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
 
         /**
+         * Loads Async request class
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/libraries/wp-async-request.php';
+
+        /**
          * The class responsible for orchestrating the actions and filters of the
          * core plugin.
          */
@@ -165,7 +170,7 @@ class Recommender
         /**
          * Hooks for event catching
          */
-        $event_catcher = new Recommender_Event_Catcher();
+        $event_catcher = new Recommender_Event_Catcher(new Recommender_API());
 
         $this->loader->add_action('woocommerce_add_to_cart', $event_catcher,'woocommerce_add_to_cart_callback', 10, 6);
         $this->loader->add_action('woocommerce_single_product_summary', $event_catcher, 'woocommerce_single_product_summary_callback', 25);
@@ -176,7 +181,7 @@ class Recommender
         /**
          * Hooks for product displaying
          */
-        $product_displayer = new Recommender_Product_Displayer();
+        $product_displayer = new Recommender_Product_Displayer(new Recommender_API());
         $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
             "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
             "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"

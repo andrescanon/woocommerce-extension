@@ -83,7 +83,6 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      */
     public function __construct($log_size_limit = null, $threshold = 400)
     {
-
         if ( null === $log_size_limit ) {
             $log_size_limit = 5 * 1024 * 1024;
         }

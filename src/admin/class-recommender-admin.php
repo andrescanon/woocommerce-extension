@@ -116,15 +116,15 @@ class Recommender_Admin
         if (!current_user_can('manage_options')) {
             return;
         }
-
+        $api = new Recommender_API();
         if ( isset( $_GET['settings-updated'] ) ) {
-            if (Recommender_API::get_instance()->has_connection()) {
+            if ($api->has_connection()) {
                 add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
                 $data = [
                     'log_sync_url' => Recommender_Endpoints::getLogURL(),
                     'product_sync_url' => Recommender_Endpoints::getProductURL()
                 ];
-                if(Recommender_API::get_instance()->send_post($data, 'creds')){
+                if ($api->send_post($data, 'creds')){
                     add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
                     update_option( 'cred_check_failed', false);
                     Recommender_WC_Log_Handler::logDebug('Settings Saved');

@@ -4,10 +4,11 @@
  *
  * Defines the plugin name, version and callbacks for displaying related products
  *
- * @since      0.3.0
+ * @since      0.5.0
  * @package    Recommendations
  * @subpackage Recommendations/includes
  * @author     Hannes Saariste <hannes.saariste@gmail.com>
+ * @author     Lauri Leiten    <leitenlauri@gmail.com>
  */
 class Recommender_Product_Displayer
 {
@@ -20,6 +21,26 @@ class Recommender_Product_Displayer
      * @var        array $products_to_show The ID's of the products to display.
      */
     private $products_to_show = null;
+
+    /**
+     * Used for storing the reference to the API object
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        Recommender_API $api API object
+     */
+    private $api = null;
+
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since      0.5.0
+     * @access     private
+     */
+    public function __construct($api)
+    {
+        $this->api = $api;
+    }
 
     /**
      * @param array $to_display array of products id's to show at widget
@@ -76,7 +97,7 @@ class Recommender_Product_Displayer
             'properties' => []
         ];
 
-        $received_recommendations = Recommender_API::get_instance()->send_post($data_to_send, 'recs' );
+        $received_recommendations = $this->api->send_post($data_to_send, 'recs' );
         if($received_recommendations == false || $received_recommendations == []){
             Recommender_WC_Log_Handler::logWarning('Recommender_Product_Displayer didnt recieve products from API');
             return;

@@ -5,14 +5,35 @@
  *
  * Defines the plugin name, version and hooks, filter for catching events
  *
- * @since      0.1.0
+ * @since      0.5.0
  * @package    Recommendations
  * @subpackage Recommendations/includes
  * @author     Martin Jürgel <martin457345@gmail.com>
+ * @author     Lauri Leiten  <leitenlauri@gmail.com>
  */
 
 class Recommender_Event_Catcher
 {
+
+    /**
+     * Used for storing the reference to the API object
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        Recommender_API $api API object
+     */
+    private $api = null;
+
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since      0.5.0
+     * @access     private
+     */
+    public function __construct($api)
+    {
+        $this->api = $api;
+    }
 
     /**
      * Callback for catching search events.
@@ -49,7 +70,7 @@ class Recommender_Event_Catcher
                 'properties' => $filters
 
             ];
-            Recommender_API::get_instance()->send_post($data, 'search');
+            $this->api->send_post($data, 'search');
         }
         return $query;
     }
@@ -73,7 +94,7 @@ class Recommender_Event_Catcher
             return;
 
         $properties =  [
-            'categories' => wc_get_product_category_list($product_id),
+            'categories' => strip_tags(wc_get_product_category_list($product_id)),
             'stock_status' => wc_get_product($product_id)->get_stock_status()
         ];
         $data = [
@@ -82,7 +103,7 @@ class Recommender_Event_Catcher
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()->send_post($data, 'add');
+        $this->api->send_post($data, 'add');
     }
 
     /**
@@ -114,7 +135,7 @@ class Recommender_Event_Catcher
         if (get_option('disable_default_box') == 1)
             remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
-        Recommender_API::get_instance()->send_post($data, 'view');
+        $this->api->send_post($data, 'view');
     }
 
     /**
@@ -155,7 +176,7 @@ class Recommender_Event_Catcher
             'currency' => $currency,
             'properties' => []
         ];
-        Recommender_API::get_instance()->send_post($data, 'purchase');
+        $this->api->send_post($data, 'purchase');
     }
 
 

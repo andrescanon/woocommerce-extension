@@ -10,18 +10,8 @@
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  * @author     Stiivo Siider <stiivosiider@gmail.com>
  */
-class Recommender_API
+class Recommender_API extends WP_Async_Request
 {
-
-	/**
-	 * An instance of this class
-	 *
-	 * @since      0.2.0
-	 * @access     private
-	 * @var        Recommender_API $instance An instance of this class
-	 */
-	private static $instance = null;
-
 	/**
 	 * Shop ID
 	 *
@@ -29,7 +19,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $shop_id Shop ID
 	 */
-	private static $shop_id = null;
+	private $shop_id = null;
 
 	/**
 	 * API key
@@ -38,25 +28,16 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API key
 	 */
-	private static $key = null;
-
-	/**
-	 * API URL
-	 *
-	 * @since      0.2.0
-	 * @access     private
-	 * @var        string $key API URL
-	 */
-	private static $api_url = 'http://127.0.0.1:5678/api/v2';
+	private $key = null;
 
 	/**
 	 * API endpoints
 	 *
 	 * @since      0.2.0
 	 * @access     private
-	 * @var        ArrayObject $key API endpoints
+	 * @var        ArrayObject $endpoints API endpoints
 	 */
-	private static $endpoints = [
+	private $endpoints = [
 		'add' => '/send_add_to_cart',
 		'purchase' => '/send_purchase',
 		'view' => '/send_view',
@@ -74,7 +55,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        ArrayObject $fields JSON field information
 	 */
-	private static $fields = [
+	private $fields = [
 		'add' => ["item_id", "stacc_id", "website", "properties"],
 		'purchase' => ["stacc_id", "item_list", "website", "currency", "properties"],
 		'view' => ["item_id", "stacc_id", "website", "properties"],
@@ -85,36 +66,53 @@ class Recommender_API
         'creds' => ["log_sync_url", "product_sync_url"]
 	];
 
+    /**
+     * API URL
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        string $query_url API URL
+     */
+    private $api_url = 'http://127.0.0.1:5678/api/v2';
+
+    /**
+     * Query URL
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        string $query_url Query URL
+     */
+    protected $query_url = null;
+
+    /**
+     * Query arguments
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        string $query_args Args
+     */
+    protected $query_args = null;
+
+    /**
+     * POST arguments
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        string $query_url POST args
+     */
+    protected $post_args = null;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since      0.2.0
+	 * @since      0.5.0
 	 * @access     private
 	 */
-	private function __construct()
+	public function __construct()
 	{
-		self::$shop_id = get_option('shop_id');
-		self::$key = get_option('api_key');
-	}
-
-	/**
-	 * Prevents cloning of a class instance
-	 *
-	 * @since      0.2.0
-	 * @access     private
-	 */
-	private function __clone() {}
-
-	/**
-	 * Returns an instance of this class
-	 *
-	 * @since      0.2.0
-	 */
-	public static function get_instance()
-	{
-		if (self::$instance == null)
-			self::$instance = new Recommender_API();
-		return self::$instance;
+	    $this->shop_id = get_option('shop_id');
+		$this->key = get_option('api_key');
+		parent::__construct();
 	}
 
 	/**
@@ -126,7 +124,7 @@ class Recommender_API
 	 * @param      int $timeout Default value 5000
 	 * @return     bool $status true if everything went well; false otherwise
 	 */
-	public function send_post($data, $event_type, $timeout = 5000)
+	public function send_post($data, $event_type, $timeout = 5)
 	{
         if ($event_type != 'recs')
             error_log($event_type);
@@ -137,50 +135,60 @@ class Recommender_API
 
 		try
 		{
-			// Checks whether the event given in function arguments exists
-			if (!array_key_exists($event_type, self::$endpoints))
-				throw new Exception("Couldn't find an endpoint matching " . $event_type);
+            // Checks whether the event given in function arguments exists
+            if (!array_key_exists($event_type, $this->endpoints))
+                throw new Exception("Couldn't find an endpoint matching " . $event_type);
 
-			// Concatenates the API URL and endpoint path
-			$url = self::$api_url . self::$endpoints[$event_type];
+            // Concatenates the API URL and endpoint path
+            $url = $this->api_url . $this->endpoints[$event_type];
 
-			foreach (self::$fields[$event_type] as $field)
-			{
-				if (!isset($data[$field]) || !array_key_exists($field, $data))
-				{
-					throw new Exception("Data validation failed - " . $field . " is not set");
-				}
-			}
+            foreach ($this->fields[$event_type] as $field)
+            {
+                if (!isset($data[$field]) || !array_key_exists($field, $data))
+                {
+                    throw new Exception("Data validation failed - " . $field . " is not set");
+                }
+            }
 
-			// Sends the data to the API
-			$data_string = json_encode( $data );
-            Recommender_WC_Log_Handler::logDebug($event_type .": " . $data_string);
+            // Checks if the POST request response is needed
+            $blocking = false;
+            if ($event_type == "recs" || $event_type == "creds" || $event_type == "logs" || $event_type == "catalog")
+                $blocking = true;
 
-			$ch = curl_init( $url );
-			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
-					'Content-Type: application/json',
-					'Content-Length: ' . strlen( $data_string )
-				)
-			);
-			curl_setopt( $ch, CURLOPT_USERPWD, self::$shop_id . ":" . self::$key );
-			curl_setopt( $ch, CURLOPT_FRESH_CONNECT, 1 );
-			curl_setopt( $ch, CURLOPT_TIMEOUT_MS, $timeout );
-			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			$response = curl_exec( $ch );
-			$result = json_decode ( $response );
+            $data_json = json_encode($data);
 
-            if (!curl_errno($ch)){
-                switch ($http_code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)){
+            // Sends the data to the API
+            Recommender_WC_Log_Handler::logDebug($event_type .": " . $data_json);
+
+            $this->query_url = $url;
+            $this->query_args = array();
+            $this->post_args = array(
+                'timeout'   => $timeout,
+                'blocking'  => $blocking,
+                'headers'   => array(
+                    'Content-Type'   => 'application/json',
+                    'Content-Length' => strlen( $data_json ),
+                    'Authorization'  => 'Basic ' . base64_encode($this->shop_id . ":" . $this->key)
+                ),
+                'body'      => $data_json
+            );
+            $response = $this->dispatch();
+
+            // TODO log something when it is blocking?
+            // currently there is no way to know if the request succeeded
+            if (!$blocking)
+                return true;
+
+            if (!is_wp_error($response)){
+                switch ($http_code = $response['response']['code']){
                     case 200:
-                        if($event_type == 'recs') return $result;
+                        if($event_type == 'recs') return $response['body'];
                         return true;
                     default:
-                        throw new Exception("Event type ".$event_type." with data_string: ".$data_string." gave an unexpected code: " . $http_code . " with result: " . $response);
+                        throw new Exception("Event type ".$event_type." with data_json: ".$data_json." gave an unexpected code: " . $http_code . " with result: " . $response);
                 }
             } else {
-                throw new Exception(curl_error($ch));
+                throw new Exception($response);
             }
 		}
 		catch (Exception $exception)
@@ -198,8 +206,7 @@ class Recommender_API
      */
 	public function has_connection(){
 	    try {
-            $url = self::$api_url . '/info';
-
+            $url = $this->api_url . '/info';
             $ch = curl_init( $url );
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "Accept: application/json"
@@ -228,5 +235,15 @@ class Recommender_API
         }
     }
 
+    /**
+     * Handle
+     *
+     * Override this method to perform any actions required
+     * during the async request.
+     */
+    protected function handle()
+    {
+        return;
+    }
 }
 ?>

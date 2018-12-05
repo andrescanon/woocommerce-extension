@@ -56,6 +56,7 @@ class Recommender_Syncer
      */
     public function sync_catalog( )
     {
+        $api = new Recommender_API();
         $total = 0;
         $size = 50;
         $currency = get_woocommerce_currency();
@@ -86,7 +87,7 @@ class Recommender_Syncer
                 'properties' => []
             ];
 
-            Recommender_API::get_instance()->send_post($data, 'catalog');
+            $api->send_post($data, 'catalog');
         }
         return true;
     }
@@ -98,6 +99,7 @@ class Recommender_Syncer
      */
     public function sync_logs( )
     {
+        $api = new Recommender_API();
         $response = false;
         $batchSize = 250;
         $fileName = Recommender_WC_Log_Handler::get_output_file_path();
@@ -108,7 +110,7 @@ class Recommender_Syncer
         if(count($logs) > 0) {
             for ($i = 0; $i < $logsSize; $i += $batchSize) {
                 if ($errors > 0) {
-                    Recommender_WC_Logger::logError("Failed to send the logs" . array("lastBatch" => $sendSliceSize . "/" . $logsSize));
+                    Recommender_WC_Log_Handler::logError("Failed to send the logs" . array("lastBatch" => $sendSliceSize . "/" . $logsSize));
                     break;
                 }
                 $sendSlice = array_slice($logs, $i, $batchSize);
@@ -127,11 +129,11 @@ class Recommender_Syncer
                     'logs' => $sendSlice,
                 ];
 
-                $request = Recommender_API::get_instance()->send_post($logSlice, "logs");
+                $request = $api->send_post($logSlice, "logs");
                 $response = $request;
                 if (!$response) {
                     $errors++;
-                    Recommender_WC_Logger::logError("No. " . $errors . array($this->$fileName));
+                    Recommender_WC_Log_Handler::logError("No. " . $errors . array($this->$fileName));
                 }
             }
 
