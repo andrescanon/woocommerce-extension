@@ -84,7 +84,8 @@ class Recommender_Endpoints extends WP_REST_Controller {
 
 	    Recommender_WC_Log_Handler::get_instance()::logNotice("Product syncing started!");
 	    Recommender_Syncer::get_instance()->sync_products();
-        return new WP_REST_Response( array(), 200 );
+	    Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing done!");
+    	    return new WP_REST_Response( array(), 200 );
     }
 
     /**
@@ -101,6 +102,7 @@ class Recommender_Endpoints extends WP_REST_Controller {
 
 	    Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing started!");
 	    Recommender_Syncer::get_instance()->sync_logs();
+	    Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing done!");
 	    return new WP_REST_Response( array(), 200 );
     }
 
