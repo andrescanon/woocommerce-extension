@@ -73,7 +73,7 @@ class Recommender_API extends WP_Async_Request
      * @access     private
      * @var        string $query_url API URL
      */
-    private $api_url = 'http://127.0.0.1:5678/api/v2';
+    private $api_url = 'https://recommender.stacc.cloud/api/v2';
 
     /**
      * Query URL
