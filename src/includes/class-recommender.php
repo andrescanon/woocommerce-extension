@@ -273,7 +273,12 @@ class Recommender
      */
     public static function get_session_id()
     {
-        $user_id = WC()->session->get_customer_id();
+        $session = WC()->session;
+        if ($session == null)
+            return null;
+        $user_id = $session->get_customer_id();
+        if ($user_id == null)
+            return null;
         Recommender_WC_Log_Handler::logDebug( "Customer ID: " . $user_id );
 
         if ($user_id == null)
