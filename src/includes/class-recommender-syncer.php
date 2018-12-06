@@ -21,6 +21,15 @@ class Recommender_Syncer
      */
     private static $instance = null;
 
+	/**
+	 * The current version of the plugin.
+	 *
+	 * @since    0.6.0
+	 * @access   protected
+	 * @var      string $version The current version of the plugin.
+	 */
+	private $version = null;
+
     /**
      * Prevents cloning of a class instance
      *
@@ -44,17 +53,22 @@ class Recommender_Syncer
     /**
      * Initialize the class and set its properties.
      *
-     * @since      0.4.0
+     * @since      0.6.0
      */
     private function __construct()
-    {}
+    {
+	    if (!defined('PLUGIN_NAME_VERSION'))
+		    define('PLUGIN_NAME_VERSION', '1.0.0');
+
+	    $this->version = PLUGIN_NAME_VERSION;
+    }
 
     /**
      * Callback for collecting and sending the catalog.
      *
-     * @since      0.4.0
+     * @since      0.6.0
      */
-    public function sync_catalog( )
+    public function sync_products( )
     {
         $api = new Recommender_API();
         $total = 0;
@@ -122,7 +136,7 @@ class Recommender_Syncer
                         "msg" => "Finished sending logs " . ($sendSliceSize + 1) . "/" . ($logsSize),
                         "timestamp" => time(),
                         "context" => ["size" => $sendSliceSize + 1],
-                        "extension_version" => self::$version
+                        "extension_version" => $this->version
                     );
                 }
                 $logSlice = [
@@ -133,7 +147,7 @@ class Recommender_Syncer
                 $response = $request;
                 if (!$response) {
                     $errors++;
-                    Recommender_WC_Log_Handler::logError("No. " . $errors . array($this->$fileName));
+                    Recommender_WC_Log_Handler::logError('No. ' . $errors . $this->$fileName);
                 }
             }
 
@@ -169,7 +183,7 @@ class Recommender_Syncer
                 "msg" => "Sending " . (count($logs) + 2) . " logs",
                 "timestamp" => time(),
                 "context" => ["size" => (count($logs) + 2)],
-                "extension_version" => self::$version
+                "extension_version" => $this->version
             ]], $logs);
         } catch (Exception $exception) {
             Recommender_WC_Log_Handler::logError("Recommender_Log_Sender->recommender_retrieve_logs() Exception: ", array(get_class($exception), $exception->getMessage(), $exception->getCode()));

@@ -128,8 +128,8 @@ class Recommender_API extends WP_Async_Request
 	{
         if ($event_type != 'recs')
             error_log($event_type);
-        
-	    if($event_type != 'creds' && get_option( 'cred_check_failed', $default = true )){
+
+		if($event_type != 'creds' && get_option( 'cred_check_failed', $default = true )){
 	        return false;
         }
 
@@ -182,7 +182,7 @@ class Recommender_API extends WP_Async_Request
             if (!is_wp_error($response)){
                 switch ($http_code = $response['response']['code']){
                     case 200:
-                        if($event_type == 'recs') return json_decode($response['body'])->items;
+	                    if($event_type == 'recs') return json_decode($response['body'])->items;
                         return true;
                     default:
                         throw new Exception("Event type ".$event_type." with data_json: ".$data_json." gave an unexpected code: " . $http_code . " with message: " . $response['response']['message']);

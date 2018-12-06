@@ -81,7 +81,7 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
      * @param      $threshold Integer minimum log level to handle.
      */
-    public function __construct($log_size_limit = null, $threshold = 400)
+    public function __construct($log_size_limit = null, $threshold = 300)
     {
         if ( null === $log_size_limit ) {
             $log_size_limit = 5 * 1024 * 1024;

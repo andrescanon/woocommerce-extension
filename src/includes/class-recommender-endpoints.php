@@ -52,39 +52,97 @@ class Recommender_Endpoints extends WP_REST_Controller {
         $log_route = Recommender_Endpoints::getLogRoute();
 
         register_rest_route( $base, $product_route, array(
-            'methods' => 'GET',
+            'methods'  => 'GET',
             'callback' => array( $this, 'sync_products' ),
+	        'args'     => array(
+	        	'h',
+		        't'
+	        )
         ) );
 
         register_rest_route( $base, $log_route, array(
-            'methods' => 'GET',
+            'methods'  => 'GET',
             'callback' => array( $this, 'sync_logs' ),
+            'args'     => array(
+	            'h',
+	            't'
+            )
         ) );
     }
 
     /**
      * Start the process of syncing products
      *
-     * @since 0.4.0
+     * @since 0.6.0
      * @param WP_REST_Request $request Full data about the request.
      * @return WP_REST_Response
      */
     public function sync_products( $request ) {
-        //Recommender_Syncer::get_instance()->sync_catalog();
+	    $handle = $this->handle_params("products", $request);
+	    if (!is_bool($handle))
+		    return $handle;
+
+	    Recommender_WC_Log_Handler::get_instance()::logNotice("Product syncing started!");
+	    Recommender_Syncer::get_instance()->sync_products();
         return new WP_REST_Response( array(), 200 );
     }
 
     /**
      * Start the process of syncing logs
      *
-     * @since 0.4.0
+     * @since 0.6.0
      * @param WP_REST_Request $request Full data about the request.
      * @return WP_REST_Response
      */
     public function sync_logs( $request ) {
-        //Recommender_Syncer::get_instance()->sync_logs();
-        return new WP_REST_Response( array(), 200 );
+	    $handle = $this->handle_params("logs", $request);
+	    if (!is_bool($handle) || !$handle)
+	    	return $handle;
+
+	    Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing started!");
+	    Recommender_Syncer::get_instance()->sync_logs();
+	    return new WP_REST_Response( array(), 200 );
     }
+
+	/**
+	 * Handles the parameters of the request
+	 *
+	 * @since 0.6.0
+	 * @param string $type The type of sync request
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_REST_Response|boolean
+	 */
+	private function handle_params( $type, $request ) {
+		$h = $request->get_param('h');
+		$t = $request->get_param('t');
+
+		// Check if both parameters are set
+		if ($h == null || $t == null)
+		{
+			Recommender_WC_Log_Handler::get_instance()::logError($type . " syncing error: param missing; h = " . $h . "; t = " . $t);
+			return new WP_REST_Response( array(), 418 );
+		}
+
+		// Check if hash is correct
+		$shop_id = get_option('shop_id');
+		$key = get_option('api_key');
+		$ourHash = hash("sha256", $shop_id . $key);
+		
+		if (!hash_equals($h, $ourHash))
+		{
+			Recommender_WC_Log_Handler::get_instance()::logError($type . " syncing error: unauthorized access");
+			return new WP_REST_Response( array(), 418 );
+		}
+
+		// Check if timestamp is numeric
+		if (!is_numeric($t))
+		{
+			Recommender_WC_Log_Handler::get_instance()::logError($type . " syncing error: timestamp isn't numeric");
+			return new WP_REST_Response( array(), 418 );
+		}
+
+		return true;
+	}
 
     /**
      * Getter for static variable $base

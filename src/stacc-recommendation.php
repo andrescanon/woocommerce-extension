@@ -21,7 +21,7 @@ if (!defined('WPINC')) {
 /**
  * Current plugin version.
  */
-define('PLUGIN_NAME_VERSION', '0.5.0');
+define('PLUGIN_NAME_VERSION', '0.6.0');
 
 /**
  * The code that runs before the plugin starts.
