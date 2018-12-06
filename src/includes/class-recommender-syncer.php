@@ -70,11 +70,18 @@ class Recommender_Syncer
      */
     public function sync_products( )
     {
+        $startTime = time();
+        $counter = 0;
+        $errors = 0;
         $api = new Recommender_API();
         $total = 0;
         $size = 50;
         $currency = get_woocommerce_currency();
         while(true) {
+            if ($errors > 0) {
+                Recommender_WC_Log_Handler::logError("Failed to sync products after ".$counter." products sent");
+                break;
+            }
             $products = wc_get_products(array(
                 'status' => 'publish',
                 'stock_status' => 'instock',
@@ -85,6 +92,7 @@ class Recommender_Syncer
             if(empty($products)){
                 break;
             }
+            $counter+=count($products);
 
             $bulk = [];
             foreach ($products as $product){
@@ -101,9 +109,17 @@ class Recommender_Syncer
                 'properties' => []
             ];
 
-            $api->send_post($data, 'catalog');
+            $response = $api->send_post($data, 'catalog');
+            if (!$response) {
+                $errors++;
+                Recommender_WC_Log_Handler::logError('Product Syncing: No. ' . $errors);
+            }
         }
-        return true;
+        if ($response) {
+            Recommender_WC_Log_Handler::logNotice("Product syncing successful. Synced ".$counter." products in ".(time()-$startTime));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -143,8 +159,7 @@ class Recommender_Syncer
                     'logs' => $sendSlice,
                 ];
 
-                $request = $api->send_post($logSlice, "logs");
-                $response = $request;
+                $response = $api->send_post($logSlice, "logs");
                 if (!$response) {
                     $errors++;
                     Recommender_WC_Log_Handler::logError('No. ' . $errors . $this->$fileName);
