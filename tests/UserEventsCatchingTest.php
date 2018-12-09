@@ -20,7 +20,7 @@ class UserEventsCatchingTest extends AbstractTestCase
         $this->wd->get(self::$baseUrl);
     }
 
-    public function testScenario()
+    public function testEventCatching()
     {
         //Check that we are on the correct website
         $this->assertContains('Demo Site For STACC', $this->wd->getTitle());
@@ -72,15 +72,6 @@ class UserEventsCatchingTest extends AbstractTestCase
         //Read the log
         $log = file_get_contents(self::$baseUrl."/wp-content/debug.log");
         $this->assertContains('search', $log);
-    }
-
-    private function ifElementExists($path){
-        try{
-            $this->wd->findElement(WebDriverBy::xpath(($path)));
-            return True;
-        } catch (Exception $e){
-            return False;
-        }
     }
 
     private function deleteLog(){

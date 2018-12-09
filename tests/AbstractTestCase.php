@@ -37,4 +37,13 @@ abstract class AbstractTestCase extends \Lmc\Steward\Test\AbstractTestCase
                 throw new \RuntimeException(sprintf('Unknown environment "%s"', ConfigProvider::getInstance()->env));
         }
     }
+
+    protected function ifElementExists($path){
+        try{
+            $this->wd->findElement(WebDriverBy::xpath(($path)));
+            return True;
+        } catch (Exception $e){
+            return False;
+        }
+    }
 }
