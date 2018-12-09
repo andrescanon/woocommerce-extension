@@ -4,9 +4,8 @@
 
 namespace My\Tests;
 
-use Exception;
-use Facebook\WebDriver\WebDriverElement;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverElement;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\WebDriverKeys;
 
@@ -39,7 +38,7 @@ class UserEventsCatchingTest extends AbstractTestCase
         $this->assertTrue($this->ifElementExists('//button[@name="add-to-cart"]'));
 
         //Read the log
-        $log = file_get_contents(self::$baseUrl."/wp-content/debug.log");
+        $log = file_get_contents(self::$baseUrl . "/wp-content/debug.log");
         $this->assertContains('view', $log);
 
         $this->deleteLog();
@@ -53,7 +52,7 @@ class UserEventsCatchingTest extends AbstractTestCase
         $this->assertTrue($this->ifElementExists('//button[@name="add-to-cart"]'));
 
         //Read the log
-        $log = file_get_contents(self::$baseUrl."/wp-content/debug.log");
+        $log = file_get_contents(self::$baseUrl . "/wp-content/debug.log");
         $this->assertContains('add', $log);
 
         //Go back onto the home page
@@ -70,13 +69,14 @@ class UserEventsCatchingTest extends AbstractTestCase
         $this->wd->wait(5);
 
         //Read the log
-        $log = file_get_contents(self::$baseUrl."/wp-content/debug.log");
+        $log = file_get_contents(self::$baseUrl . "/wp-content/debug.log");
         $this->assertContains('search', $log);
     }
 
-    private function deleteLog(){
+    private function deleteLog()
+    {
         //Delete debug.log
-        $this->wd->navigate()->to(self::$baseUrl."/wp-content/dellog.php");
+        $this->wd->navigate()->to(self::$baseUrl . "/wp-content/dellog.php");
         $this->wd->navigate()->back();
     }
 }

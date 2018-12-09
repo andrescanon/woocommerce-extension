@@ -4,7 +4,10 @@
 
 namespace My\Tests;
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverElement;
 use Lmc\Steward\ConfigProvider;
+
 /**
  * Abstract class for custom tests, could eg. define some properties or instantiate some common components
  * using @before annotated methods.
@@ -38,11 +41,12 @@ abstract class AbstractTestCase extends \Lmc\Steward\Test\AbstractTestCase
         }
     }
 
-    protected function ifElementExists($path){
-        try{
+    protected function ifElementExists($path)
+    {
+        try {
             $this->wd->findElement(WebDriverBy::xpath(($path)));
             return True;
-        } catch (Exception $e){
+        } catch (Exception $e) {
             return False;
         }
     }

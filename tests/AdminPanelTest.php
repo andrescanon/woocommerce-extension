@@ -4,6 +4,9 @@
 namespace My\Tests;
 
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverElement;
+
 class AdminPanelTest extends AbstractTestCase
 {
     /**
