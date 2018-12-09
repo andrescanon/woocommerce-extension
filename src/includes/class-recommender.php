@@ -160,7 +160,7 @@ class Recommender
         /**
          * Hooks for admin areas
          */
-        $plugin_admin = new Recommender_Admin($this->get_plugin_name(), $this->get_version());
+        $plugin_admin = new Recommender_Admin();
 
         $this->loader->add_action('admin_menu', $plugin_admin, 'recommender_admin_menu');
         $this->loader->add_action('admin_init', $plugin_admin, 'recommender_admin_init');

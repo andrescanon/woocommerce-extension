@@ -79,7 +79,7 @@ class Recommender_API extends WP_Async_Request
      * Query URL
      *
      * @since      0.5.0
-     * @access     private
+     * @access     protected
      * @var        string $query_url Query URL
      */
     protected $query_url = null;
@@ -88,7 +88,7 @@ class Recommender_API extends WP_Async_Request
      * Query arguments
      *
      * @since      0.5.0
-     * @access     private
+     * @access     protected
      * @var        string $query_args Args
      */
     protected $query_args = null;
@@ -97,7 +97,7 @@ class Recommender_API extends WP_Async_Request
      * POST arguments
      *
      * @since      0.5.0
-     * @access     private
+     * @access     protected
      * @var        string $query_url POST args
      */
     protected $post_args = null;
@@ -106,7 +106,7 @@ class Recommender_API extends WP_Async_Request
 	 * Initialize the class and set its properties.
 	 *
 	 * @since      0.5.0
-	 * @access     private
+	 * @access     public
 	 */
 	public function __construct()
 	{

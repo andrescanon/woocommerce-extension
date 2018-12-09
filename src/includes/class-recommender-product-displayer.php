@@ -55,7 +55,7 @@ class Recommender_Product_Displayer
      * Initialize the class and set its properties.
      *
      * @since      0.5.0
-     * @access     private
+     * @access     public
      */
     public function __construct($api)
     {

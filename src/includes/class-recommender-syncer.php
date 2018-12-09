@@ -25,7 +25,7 @@ class Recommender_Syncer
 	 * The current version of the plugin.
 	 *
 	 * @since    0.6.0
-	 * @access   protected
+	 * @access   private
 	 * @var      string $version The current version of the plugin.
 	 */
 	private $version = null;
@@ -54,6 +54,7 @@ class Recommender_Syncer
      * Initialize the class and set its properties.
      *
      * @since      0.6.0
+     * @access     private
      */
     private function __construct()
     {
@@ -75,7 +76,7 @@ class Recommender_Syncer
         $errors = 0;
         $api = new Recommender_API();
         $total = 0;
-        $size = 50;
+        $size = 250;
         $currency = get_woocommerce_currency();
         while(true) {
             if ($errors > 0) {

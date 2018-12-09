@@ -16,20 +16,11 @@ class Recommender_Admin
 {
 
     /**
-     * The ID of this plugin.
+     * The current version of the plugin.
      *
-     * @since      0.1.0
-     * @access     private
-     * @var        string $plugin_name The ID of this plugin.
-     */
-    private $plugin_name;
-
-    /**
-     * The version of this plugin.
-     *
-     * @since      0.1.0
-     * @access     private
-     * @var        string $version The current version of this plugin.
+     * @since    0.1.0
+     * @access   private
+     * @var      string $version The current version of the plugin.
      */
     private $version;
 
@@ -37,15 +28,10 @@ class Recommender_Admin
      * Initialize the class and set its properties.
      *
      * @since      0.1.0
-     * @param      string $plugin_name The name of this plugin.
-     * @param      string $version The version of this plugin.
      */
-    public function __construct($plugin_name, $version)
+    public function __construct()
     {
-
-        $this->plugin_name = $plugin_name;
-        $this->version = $version;
-
+        $this->version = PLUGIN_NAME_VERSION;
     }
 
     /**
@@ -140,16 +126,16 @@ class Recommender_Admin
                     'product_sync_url' => Recommender_Endpoints::getProductURL() . '&'
                 ];
                 if ($api->send_post($data, 'creds')){
-                    add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
+                    add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Setup Successful', 'recommender'), 'updated');
                     update_option( 'cred_check_failed', false);
                     Recommender_WC_Log_Handler::logDebug('Settings Saved');
                 } else {
-                    add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Plugin Set Up Failed -Check your Shop ID and API Key', 'recommender'), 'error');
+                    add_settings_error('recommender_messages', 'recommender_message', __('Validation Error - Plugin Setup Failed - Check your Shop ID and API Key', 'recommender'), 'error');
                     update_option( 'cred_check_failed', true);
                     Recommender_WC_Log_Handler::logError('Validation Error');
                 }
             } else {
-                add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline - Plugin Set Up Failed', 'recommender'), 'error');
+                add_settings_error('recommender_messages', 'recommender_api_connection', __('API Offline - Plugin Setup Failed', 'recommender'), 'error');
                 update_option( 'cred_check_failed', true);
                 Recommender_WC_Log_Handler::logWarning('API Offline - Settings not saved');
             }
