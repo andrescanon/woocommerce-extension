@@ -24,8 +24,8 @@ class AdminPanelTest extends AbstractTestCase
         $this->assertContains('Log In', $this->wd->getTitle());
 
         //Insert login data and press login
-        $this->wd->findElement(WebDriverBy::xpath("//form[@id = 'loginform']/p/label/input[@id = 'user_login']"))->value(getenv('ADMIN_USERNAME'));
-        $this->wd->findElement(WebDriverBy::xpath("//form[@id = 'loginform']/p/label/input[@id = 'user_pass']"))->value(getenv('ADMIN_PASSWORD'));
+        $this->wd->findElement(WebDriverBy::xpath("//form[@id = 'loginform']/p/label/input[@id = 'user_login']"))->sendKeys(getenv('ADMIN_USERNAME'));
+        $this->wd->findElement(WebDriverBy::xpath("//form[@id = 'loginform']/p/label/input[@id = 'user_pass']"))->sendKeys(getenv('ADMIN_PASSWORD'));
         $this->wd->findElement(WebDriverBy::xpath("//form[@id = 'loginform']/p/input[@id = 'wp-submit']"));
         $this->wd->wait(10, 500)->until(WebDriverExpectedCondition::titleContains('Demo Site'));
 
