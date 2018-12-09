@@ -135,7 +135,7 @@ class Recommender_Product_Displayer
 
         $received_ids = $this->api->send_post($data_to_send, 'recs' );
         if($received_ids == false || $received_ids == []){
-            Recommender_WC_Log_Handler::logWarning('Recommender_Product_Displayer didnt recieve products from API');
+            Recommender_WC_Log_Handler::logWarning('Recommender_Product_Displayer didnt receive products from API');
             return;
         }
         Recommender_WC_Log_Handler::logDebug('Recommended product IDs received from API: ' . json_encode($received_ids));
