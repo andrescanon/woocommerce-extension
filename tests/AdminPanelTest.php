@@ -33,6 +33,10 @@ class AdminPanelTest extends AbstractTestCase
         //Check if we are on the Dashboard
         $this->assertContains('Dashboard', $this->wd->getTitle());
 
+        //Open WooCommerce top level page
+        $this->wd->findElement(WebDriverBy::xpath("//li[@id = 'toplevel_page_woocommerce']/a"))->click();
+        $this->wd->wait(10, 500)->until(WebDriverExpectedCondition::titleContains('Demo Site'));
+
         //Go to our Admin page
         $this->wd->findElement(WebDriverBy::xpath("//li[@id = 'toplevel_page_woocommerce']/ul/li/a[.='STACC']"))->click();
         $this->wd->wait(10, 500)->until(WebDriverExpectedCondition::titleContains('Demo Site'));
