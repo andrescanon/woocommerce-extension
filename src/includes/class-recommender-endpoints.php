@@ -20,7 +20,7 @@ class Recommender_Endpoints extends WP_REST_Controller {
      * @access   private
      * @var      string $namespace Stores the base part of the endpoint
      */
-    private static $base = 'recommender/v1';
+    private static $base = 'recommender/v2';
 
     /**
      * Stores the route part of the product sync endpoint
@@ -48,8 +48,8 @@ class Recommender_Endpoints extends WP_REST_Controller {
     public function register_routes()
     {
         $base = Recommender_Endpoints::getBase();
-        $product_route = Recommender_Endpoints::getProductRoute();
-        $log_route = Recommender_Endpoints::getLogRoute();
+        $product_route = Recommender_Endpoints::getProductRoute() . '([&]?)';
+        $log_route = Recommender_Endpoints::getLogRoute() . '([&]?)';
 
         register_rest_route( $base, $product_route, array(
             'methods'  => 'GET',
@@ -85,7 +85,7 @@ class Recommender_Endpoints extends WP_REST_Controller {
 	    Recommender_WC_Log_Handler::get_instance()::logNotice("Product syncing started!");
 	    Recommender_Syncer::get_instance()->sync_products();
 	    Recommender_WC_Log_Handler::get_instance()::logNotice("Product syncing done!");
-    	    return new WP_REST_Response( array(), 200 );
+	    return new WP_REST_Response( array(), 200 );
     }
 
     /**
@@ -118,11 +118,14 @@ class Recommender_Endpoints extends WP_REST_Controller {
 		$h = $request->get_param('h');
 		$t = $request->get_param('t');
 
+		if ($h == null)
+			$h = $request->get_param('?h');
+
 		// Check if both parameters are set
 		if ($h == null || $t == null)
 		{
 			Recommender_WC_Log_Handler::get_instance()::logError($type . " syncing error: param missing; h = " . $h . "; t = " . $t);
-			return new WP_REST_Response( array(), 418 );
+			return new WP_REST_Response( array("Parameters not set!"), 418 );
 		}
 
 		// Check if hash is correct
@@ -133,14 +136,14 @@ class Recommender_Endpoints extends WP_REST_Controller {
 		if (!hash_equals($h, $ourHash))
 		{
 			Recommender_WC_Log_Handler::get_instance()::logError($type . " syncing error: unauthorized access");
-			return new WP_REST_Response( array(), 418 );
+			return new WP_REST_Response( array("Failure to authenticate!"), 418 );
 		}
 
 		// Check if timestamp is numeric
 		if (!is_numeric($t))
 		{
 			Recommender_WC_Log_Handler::get_instance()::logError($type . " syncing error: timestamp isn't numeric");
-			return new WP_REST_Response( array(), 418 );
+			return new WP_REST_Response( array("Timestamp isn't valid!"), 418 );
 		}
 
 		return true;

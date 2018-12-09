@@ -136,8 +136,8 @@ class Recommender_Admin
             if ($api->has_connection()) {
                 add_settings_error('recommender_messages', 'recommender_api_connection', __('API Online', 'recommender'), 'updated');
                 $data = [
-                    'log_sync_url' => Recommender_Endpoints::getLogURL(),
-                    'product_sync_url' => Recommender_Endpoints::getProductURL()
+                    'log_sync_url' => Recommender_Endpoints::getLogURL() . '&',
+                    'product_sync_url' => Recommender_Endpoints::getProductURL() . '&'
                 ];
                 if ($api->send_post($data, 'creds')){
                     add_settings_error('recommender_messages', 'recommender_message', __('Settings Saved - Plugin Set Up Successful', 'recommender'), 'updated');
