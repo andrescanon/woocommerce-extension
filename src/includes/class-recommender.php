@@ -180,18 +180,20 @@ class Recommender
          * Hooks for product displaying
          */
 
-        $options = array("woocommerce_before_single_product_summary"=>1, "woocommerce_after_single_product_summary"=>2,
-            "woocommerce_before_shop_loop"=>3, "woocommerce_after_shop_loop"=>4, "woocommerce_before_cart"=>5,
-            "woocommerce_after_cart_table"=>6, "woocommerce_after_cart_totals"=>7,"woocommerce_after_cart"=>8
-
+        $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
+            "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
+            "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"
         );
         $displayers = array();
 
-        foreach ($options as $option => $option_id) {
-            if (get_option($option) != false) {
+        foreach ($options as $option) {
+            $enabled = get_option($option);
+            $id = get_option($option . '_id');
+            if ($enabled && $id)
+            {
                 $displayer = new Recommender_Product_Displayer(new Recommender_API());
-                $displayers[$option_id] = $displayer;
-                $displayer->set_box_properties($option_id, $option);
+                $displayers[$id] = $displayer;
+                $displayer->set_box_properties($id, $option);
                 $this->loader->add_action($option, $displayer, 'woocommerce_output_related_products', get_option($option));
             }
         }
