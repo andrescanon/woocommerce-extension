@@ -8,17 +8,20 @@
 A step by step tutorial to get the extension up and running.
 1. Install WordPress
 2. Install WooCommerce
-3. Download ZIP of this repository
-4. Unzip the file
-5. Go to folder /src
-6. Pack everything in that folder to a ZIP file
-7. Make sure the name of the ZIP is woocommerce-extension
-8. Upload the new ZIP file through WordPress's admin panel plugin install functionality
+3. Download ZIP of the latest release from [here](https://github.com/stacc-dasso/woocommerce-extension/releases)
+4. Upload the ZIP file through WordPress's admin panel plugin install functionality
 
 ## Deployment
 
 Currently it isn't possible to connect to the API without the help of the authors of the plugin.
 Because of this, most of the functionality can't be seen.
+
+For logging (by default debug loggins is disabled) we use WooCommerce logger, so the logs will available from:  
+`Dashboard -> WooCommerce -> Status -> Logs -> StaccDefault.log`
+
+To see if the events are caught you can also enable [wordpress logging](https://codex.wordpress.org/Debugging_in_WordPress),
+which makes some basic data visible on:  
+`wp-content/debug.log`
 
 ## Built With
 

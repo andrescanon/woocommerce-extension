@@ -22,6 +22,9 @@ class Recommender_Activator
             deactivate_plugins(plugin_basename(__FILE__));
             die("WooCommerce isn't active");
         }
+	    add_option("shop_id", '');
+	    add_option("api_key", '');
+	    add_option("cred_check_failed", true);
     }
 }
 

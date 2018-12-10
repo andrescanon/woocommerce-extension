@@ -5,47 +5,34 @@
  *
  * Defines the plugin name, version and hooks, filter for catching events
  *
- * @since      0.1.0
+ * @since      0.5.0
  * @package    Recommendations
  * @subpackage Recommendations/includes
  * @author     Martin Jürgel <martin457345@gmail.com>
+ * @author     Lauri Leiten  <leitenlauri@gmail.com>
  */
 
 class Recommender_Event_Catcher
 {
 
     /**
-     * The ID of this plugin.
+     * Used for storing the reference to the API object
      *
-     * @since      0.1.0
+     * @since      0.5.0
      * @access     private
-     * @var        string $plugin_name The ID of this plugin.
+     * @var        Recommender_API $api API object
      */
-    private $plugin_name;
-
-    /**
-     * The version of this plugin.
-     *
-     * @since      0.1.0
-     * @access     private
-     * @var        string $version The current version of this plugin.
-     */
-    private $version;
-
+    private $api = null;
 
     /**
      * Initialize the class and set its properties.
      *
-     * @since      0.1.0
-     * @param      string $plugin_name The name of this plugin.
-     * @param      string $version The version of this plugin.
+     * @since      0.5.0
+     * @access     public
      */
-    public function __construct($plugin_name, $version)
+    public function __construct($api)
     {
-
-        $this->plugin_name = $plugin_name;
-        $this->version = $version;
-
+        $this->api = $api;
     }
 
     /**
@@ -59,6 +46,11 @@ class Recommender_Event_Catcher
     {
         if ( $query->is_search )
         {
+            $session_id = Recommender::get_session_id();
+
+            if ($session_id == null)
+                return $query;
+
             $_chosen_attributes = WC_Query::get_layered_nav_chosen_attributes();
             $filters = [];
             foreach ($_chosen_attributes as $key => $value)
@@ -71,14 +63,14 @@ class Recommender_Event_Catcher
             $search_query = get_search_query(true);
             //$args = $query->query;
             $data = [
-                'stacc_id' => get_current_user_id(),
+                'stacc_id' => $session_id,
                 'query' => $search_query,
                 'filters' => $_SERVER['QUERY_STRING'],
                 'website' => get_site_url(),
                 'properties' => $filters
 
             ];
-            Recommender_API::get_instance()->send_post($data, 'search');
+            $this->api->send_post($data, 'search');
         }
         return $query;
     }
@@ -96,17 +88,22 @@ class Recommender_Event_Catcher
      */
     public function woocommerce_add_to_cart_callback( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data )
     {
+        $session_id = Recommender::get_session_id();
+
+        if ($session_id == null)
+            return;
+
         $properties =  [
-            'categories' => wc_get_product_category_list($product_id),
+            'categories' => strip_tags(wc_get_product_category_list($product_id)),
             'stock_status' => wc_get_product($product_id)->get_stock_status()
         ];
         $data = [
             'item_id' => $product_id,
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => $session_id,
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        Recommender_API::get_instance()->send_post($data, 'add');
+        $this->api->send_post($data, 'add');
     }
 
     /**
@@ -116,24 +113,27 @@ class Recommender_Event_Catcher
      */
     public function woocommerce_single_product_summary_callback()
     {
+        $session_id = Recommender::get_session_id();
+
+        if ($session_id == null)
+            return;
+
         global $product;
         $id = $product->get_id();
 
         $properties =  [
-            'categories' => wc_get_product_category_list($id),
+            'categories' => strip_tags(wc_get_product_category_list($id)),
             'stock_status' => $product->get_stock_status()
         ];
 
         $data = [
             'item_id' => $id,
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => $session_id,
             'website' => get_site_url(),
             'properties' => $properties
         ];
-        if (get_option('disable_default_box') == 1)
-            remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
-        Recommender_API::get_instance()->send_post($data, 'view');
+        $this->api->send_post($data, 'view');
     }
 
     /**
@@ -144,6 +144,11 @@ class Recommender_Event_Catcher
      */
     public function woocommerce_payment_complete_callback( $order_id )
     {
+        $session_id = Recommender::get_session_id();
+
+        if ($session_id == null)
+            return;
+
         $order = wc_get_order( $order_id );
         $items = $order->get_items();
         $item_list = array();
@@ -163,14 +168,21 @@ class Recommender_Event_Catcher
 
 
         $data = [
-            'stacc_id' => get_current_user_id(),
+            'stacc_id' => $session_id,
             'item_list' => $item_list,
             'website' => get_site_url(),
             'currency' => $currency,
             'properties' => []
         ];
-        Recommender_API::get_instance()->send_post($data, 'purchase');
+        $this->api->send_post($data, 'purchase');
     }
 
-
+    /**
+     * Callback for removing the default WooCommerce related products
+     *
+     * @since 0.5.0
+     */
+    function woocommerce_remove_default_callback() {
+        remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+    }
 }

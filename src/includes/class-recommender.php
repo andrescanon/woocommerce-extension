@@ -62,27 +62,18 @@ class Recommender
      */
     public function __construct()
     {
-        if (defined('PLUGIN_NAME_VERSION')) {
-            $this->version = PLUGIN_NAME_VERSION;
-        } else {
-            $this->version = '0.1.0';
-        }
+        if (!defined('PLUGIN_NAME_VERSION'))
+            define('PLUGIN_NAME_VERSION', '1.0.0');
+
+        $this->version = PLUGIN_NAME_VERSION;
         $this->plugin_name = 'recommender';
 
         $this->load_dependencies();
-        $this->define_admin_hooks();
-        $this->define_event_hooks_filters();
-        $this->define_instances();
+        $this->define_hooks();
     }
 
     /**
-     * Load the required dependencies for this plugin.
-     *
-     * Include the following file that make up the plugin:
-     *
-     * - Recommender_Loader. Orchestrates the hooks of the plugin.
-     * - Recommender_Admin. Defines all hooks for the admin area.
-     * - Event_Catcher. Defines all hooks for catching events.
+     * Load the required dependencies for this plugins
      *
      * Create an instance of the loader which will be used to register the hooks
      * with WordPress.
@@ -107,6 +98,11 @@ class Recommender
          * Loads log handler file so it can be extended
          */
         require_once WP_PLUGIN_DIR . '/woocommerce/includes/log-handlers/class-wc-log-handler-file.php';
+
+        /**
+         * Loads Async request class
+         */
+        require_once WP_PLUGIN_DIR . '/woocommerce/includes/libraries/wp-async-request.php';
 
         /**
          * The class responsible for orchestrating the actions and filters of the
@@ -140,79 +136,91 @@ class Recommender
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-product-displayer.php';
 
         /**
-         * The class responsible for syncing the stores catalog.
+         * The class responsible for syncing
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-catalog-syncer.php';
-
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-syncer.php';
 
         /**
-         * The class responsible for sending the logs
+         * The class responsible for custom Wordpress REST API endpoints
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-log-sender.php';
-
-
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-recommender-endpoints.php';
 
         $this->loader = new Recommender_Loader();
-
     }
 
     /**
-     * Define internal instances of classes
-     * instance Recommender_WC_Log_Handler
-     *
-     * @since    0.3.0
-     * @access   private
-     */
-    private function define_instances(){
-        new Recommender_WC_Log_Handler($this->get_version());
-        new Recommender_Log_Sender($this->get_version());
-    }
 
-    /**
-     * Register all of the hooks related to the admin area functionality
-     * of the plugin.
+     * Register all of the hooks related to the plugin functionality
      *
-     * @since    0.1.0
+     * @since    0.5.0
      * @access   private
      */
-    private function define_admin_hooks()
+    private function define_hooks()
     {
-
-        $plugin_admin = new Recommender_Admin($this->get_plugin_name(), $this->get_version());
+        /**
+         * Hooks for admin areas
+         */
+        $plugin_admin = new Recommender_Admin();
 
         $this->loader->add_action('admin_menu', $plugin_admin, 'recommender_admin_menu');
         $this->loader->add_action('admin_init', $plugin_admin, 'recommender_admin_init');
-    }
 
-    /**
-     * Register all of the hooks and filters related to the event catching functionality
-     * of the plugin.
-     *
-     * @since    0.1.0
-     * @access   private
-     */
-    private function define_event_hooks_filters()
-    {
+        /**
+         * Hooks for event catching
+         */
+        $event_catcher = new Recommender_Event_Catcher(new Recommender_API());
 
-        $plugin_catcher = new Recommender_Event_Catcher($this->get_plugin_name(), $this->get_version());
-        $product_displayer = new Recommender_Product_Displayer($this->get_plugin_name(), $this->get_version());
+        $this->loader->add_action('template_redirect', $event_catcher, 'woocommerce_remove_default_callback');
+        $this->loader->add_action('woocommerce_add_to_cart', $event_catcher,'woocommerce_add_to_cart_callback', 10, 6);
+        $this->loader->add_action('woocommerce_single_product_summary', $event_catcher, 'woocommerce_single_product_summary_callback', 25);
+        $this->loader->add_action('woocommerce_payment_complete', $event_catcher, 'woocommerce_payment_complete_callback');
+        $this->loader->add_filter('pre_get_posts', $event_catcher,'woocommerce_search_callback');
 
-        $this->loader->add_action('woocommerce_add_to_cart', $plugin_catcher,'woocommerce_add_to_cart_callback', 10, 6);
-        $this->loader->add_action('woocommerce_single_product_summary', $plugin_catcher, 'woocommerce_single_product_summary_callback', 25);
-        $this->loader->add_action('woocommerce_payment_complete', $plugin_catcher, 'woocommerce_payment_complete_callback');
-        $this->loader->add_filter('pre_get_posts', $plugin_catcher,'woocommerce_search_callback');
+        /**
+         * Hooks for product displaying
+         */
 
         $options = array("woocommerce_before_single_product_summary", "woocommerce_after_single_product_summary",
             "woocommerce_before_shop_loop", "woocommerce_after_shop_loop", "woocommerce_before_cart",
             "woocommerce_after_cart_table", "woocommerce_after_cart_totals","woocommerce_after_cart"
         );
+        $displayers = array();
 
         foreach ($options as $option) {
-            if (get_option($option) != false)
+            $enabled = get_option($option);
+            $id = get_option($option . '_id');
+            if ($enabled && $id)
             {
-                $this->loader->add_action($option, $product_displayer, 'woocommerce_output_related_products', get_option($option));
+                $displayer = new Recommender_Product_Displayer(new Recommender_API());
+                $displayers[$id] = $displayer;
+                $displayer->set_box_properties($id, $option);
+                $this->loader->add_action($option, $displayer, 'woocommerce_output_related_products', get_option($option));
             }
         }
+
+
+        /**
+         * Hook for starting the WooCommerce session
+         */
+        add_action( 'woocommerce_init', function(){
+            $session = WC()->session;
+
+            if ($session == null)
+                return;
+
+            if ( ! $session->has_session() ) {
+                WC()->session->set_customer_session_cookie( true );
+            }
+        } );
+
+
+        /**
+         * Hook for creating the WP REST API endpoints
+         */
+        add_action( 'rest_api_init',  function () {
+            $routes= new Recommender_Endpoints();
+            return $routes->register_routes();
+        });
     }
 
     /**
@@ -259,4 +267,25 @@ class Recommender
         return $this->version;
     }
 
+    /**
+     * Retrieve session ID of the customer
+     *
+     * @since     0.5.0
+     * @return    string    The session ID of the customer
+     */
+    public static function get_session_id()
+    {
+        $session = WC()->session;
+        if ($session == null)
+            return null;
+        $user_id = $session->get_customer_id();
+        if ($user_id == null)
+            return null;
+        Recommender_WC_Log_Handler::logDebug( "Customer ID: " . $user_id );
+
+        if ($user_id == null)
+            Recommender_WC_Log_Handler::logError("Failed to get Customer ID; result was null");
+
+        return $user_id;
+    }
 }

@@ -1,6 +1,17 @@
 <?php
 /**
  * Modified log handler
+ *
+ * Log Level types
+ * Emergency: system is unusable
+ * Alert: action must be taken immediately
+ * Critical: critical conditions
+ * Error: error conditions
+ * Warning: warning conditions
+ * Notice: normal but significant condition
+ * Informational: informational messages
+ * Debug: debug-level messages
+ *
  * @since      0.3.0
  * @package    Recommendations
  * @subpackage Recommendations/includes
@@ -42,6 +53,61 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     protected static $version = null;
 
     /**
+     * Minimum log level this handler will process
+     * @since      0.4.0
+     * @access     protected
+     * @var        $threshold Integer minimum log level to handle.
+     */
+    protected $threshold = null;
+
+    /**
+     * @since      0.4.0
+     * @access     protected
+     * @param      $level string of the level to check
+     * @return     true if should be handled, false otherwise
+     */
+    protected function should_handle($level ) {
+        if ( null === $this->threshold ) {
+            return true;
+        }
+        return $this->threshold <= WC_Log_Levels::get_level_severity($level);
+    }
+
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since      0.3.0
+     * @access     private
+     * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
+     * @param      $threshold Integer minimum log level to handle.
+     */
+    public function __construct($log_size_limit = null, $threshold = 300)
+    {
+        if ( null === $log_size_limit ) {
+            $log_size_limit = 5 * 1024 * 1024;
+        }
+
+        $this->log_size_limit = $log_size_limit;
+        self::set_output_file('StaccDefault');
+        self::$version = PLUGIN_NAME_VERSION;
+        $this->threshold = $threshold;
+
+        add_action( 'plugins_loaded', array( $this, 'write_cached_logs' ) );
+    }
+
+    /**
+     * @since      0.3.0
+     * @access     public
+     * @return     Recommender_WC_Log_Handler instance
+     */
+    public static function get_instance()
+    {
+        if (self::$instance == null)
+            self::$instance = new Recommender_WC_Log_Handler();
+        return self::$instance;
+    }
+
+    /**
      * Sets the output file
      *
      * @since      0.3.0
@@ -63,10 +129,10 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
     public static function set_sent_and_empty_output_file(){
         if(copy(self::$output_file_path,
             WP_CONTENT_DIR . '/uploads/wc-logs/' . self::$output_file . '_sent.log')){
-            self::logNotice("Making copy of log file to " . self::$output_file . '_sent.log succeeded');
+            self::logDebug("Making copy of log file to " . self::$output_file . '_sent.log succeeded');
 
             if(self::get_instance()->remove(self::$output_file)){
-                self::logNotice("Old log file successfully deleted");
+                self::logDebug("Old log file successfully deleted");
             }
             else{
                 self::logWarning("Old log file was not deleted!");
@@ -76,38 +142,6 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
             self::logWarning("Making copy of old log file failed!");
         }
 
-    }
-    
-    /**
-     * Initialize the class and set its properties.
-     *
-     * @since      0.3.0
-     * @access     public
-     * @param      $version string plugin version
-     * @param      $log_size_limit int limit of the log, default 5 * 1024 * 1024
-     */
-    public function __construct($version , $log_size_limit = null) {
-
-        if ( null === $log_size_limit ) {
-            $log_size_limit = 5 * 1024 * 1024;
-        }
-
-        $this->log_size_limit = $log_size_limit;
-        self::set_output_file('StaccDefault');
-        self::$version = $version;
-        self::$instance = $this;
-
-        add_action( 'plugins_loaded', array( $this, 'write_cached_logs' ) );
-    }
-
-    /**
-     * @since      0.3.0
-     * @access     public
-     * @return     Recommender_WC_Log_Handler instance
-     */
-    public static function get_instance()
-    {
-        return self::$instance;
     }
 
     /**
@@ -121,16 +155,19 @@ class Recommender_WC_Log_Handler extends WC_Log_Handler_File
      */
     private function addTo( $level, $message, $context) {
 
-        $entry = json_encode([
-            "channel" => "WOOCOMMERCE_EXTENSION",
-            "level" => $level,
-            "msg" => $message,
-            "timestamp" => time(),
-            "context" => $context,
-            "extension_version" => self::$version
-        ]);
+        if($this->should_handle($level)){
+            $entry = json_encode([
+                "channel" => "WOOCOMMERCE_EXTENSION",
+                "level" => $level,
+                "msg" => $message,
+                "timestamp" => time(),
+                "context" => $context,
+                "extension_version" => self::$version
+            ]);
 
-        return $this->add( $entry, self::$output_file);
+            return $this->add( $entry, self::$output_file);
+        }
+        return;
     }
 
     // All 8 types of log level methods:

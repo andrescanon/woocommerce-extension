@@ -10,18 +10,8 @@
  * @author     Lauri Leiten <leitenlauri@gmail.com>
  * @author     Stiivo Siider <stiivosiider@gmail.com>
  */
-class Recommender_API
+class Recommender_API extends WP_Async_Request
 {
-
-	/**
-	 * An instance of this class
-	 *
-	 * @since      0.2.0
-	 * @access     private
-	 * @var        Recommender_API $instance An instance of this class
-	 */
-	private static $instance = null;
-
 	/**
 	 * Shop ID
 	 *
@@ -29,7 +19,7 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $shop_id Shop ID
 	 */
-	private static $shop_id = null;
+	private $shop_id = null;
 
 	/**
 	 * API key
@@ -38,32 +28,24 @@ class Recommender_API
 	 * @access     private
 	 * @var        string $key API key
 	 */
-	private static $key = null;
-
-	/**
-	 * API URL
-	 *
-	 * @since      0.2.0
-	 * @access     private
-	 * @var        string $key API URL
-	 */
-	private static $api_url = 'http://127.0.0.1:5678/';
+	private $key = null;
 
 	/**
 	 * API endpoints
 	 *
 	 * @since      0.2.0
 	 * @access     private
-	 * @var        ArrayObject $key API endpoints
+	 * @var        ArrayObject $endpoints API endpoints
 	 */
-	private static $endpoints = [
+	private $endpoints = [
 		'add' => '/send_add_to_cart',
 		'purchase' => '/send_purchase',
 		'view' => '/send_view',
 		'search' => '/send_search',
         'recs' => '/get_recs',
         'logs' => '/send_logs',
-        'catalog' => '/catalog_sync'
+        'catalog' => '/catalog_sync',
+        'creds' => '/check_credentials'
 	];
 
 	/**
@@ -73,50 +55,64 @@ class Recommender_API
 	 * @access     private
 	 * @var        ArrayObject $fields JSON field information
 	 */
-	private static $fields = [
+	private $fields = [
 		'add' => ["item_id", "stacc_id", "website", "properties"],
 		'purchase' => ["stacc_id", "item_list", "website", "currency", "properties"],
 		'view' => ["item_id", "stacc_id", "website", "properties"],
 		'search' => ["stacc_id", "query", "filters", "website", "properties"],
 		'recs' => ["item_id", "stacc_id", "block_id", "website", "properties"],
         'logs' => ["logs"],
-        'catalog' => ["bulk", "properties"]
+        'catalog' => ["bulk", "properties"],
+        'creds' => ["log_sync_url", "product_sync_url"]
 	];
+
+    /**
+     * API URL
+     *
+     * @since      0.5.0
+     * @access     private
+     * @var        string $query_url API URL
+     */
+    private $api_url = 'http://127.0.0.1:5678/api/v2';
+
+    /**
+     * Query URL
+     *
+     * @since      0.5.0
+     * @access     protected
+     * @var        string $query_url Query URL
+     */
+    protected $query_url = null;
+
+    /**
+     * Query arguments
+     *
+     * @since      0.5.0
+     * @access     protected
+     * @var        string $query_args Args
+     */
+    protected $query_args = null;
+
+    /**
+     * POST arguments
+     *
+     * @since      0.5.0
+     * @access     protected
+     * @var        string $query_url POST args
+     */
+    protected $post_args = null;
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since      0.2.0
-	 * @access     private
+	 * @since      0.5.0
+	 * @access     public
 	 */
-	private function __construct()
+	public function __construct()
 	{
-		//TODO validation, error-handling
-		self::$shop_id = get_option('shop_id');
-		self::$key = get_option('api_key');
-
-        //if problem:
-        //Recommender_WC_Log_Handler::logError('Validation Error');
-	}
-
-	/**
-	 * Prevents cloning of a class instance
-	 *
-	 * @since      0.2.0
-	 * @access     private
-	 */
-	private function __clone() {}
-
-	/**
-	 * Returns an instance of this class
-	 *
-	 * @since      0.2.0
-	 */
-	public static function get_instance()
-	{
-		if (self::$instance == null)
-			self::$instance = new Recommender_API();
-		return self::$instance;
+	    $this->shop_id = get_option('shop_id');
+		$this->key = get_option('api_key');
+		parent::__construct();
 	}
 
 	/**
@@ -128,69 +124,76 @@ class Recommender_API
 	 * @param      int $timeout Default value 5000
 	 * @return     bool $status true if everything went well; false otherwise
 	 */
-	public function send_post($data, $event_type, $timeout = 5000)
+	public function send_post($data, $event_type, $timeout = 5)
 	{
-        //WP internal logging for incoming events.
-        // Needs in wp-config.php
-        // define('WP_DEBUG', true);
-        // define('WP_DEBUG_LOG', true);
-        // The log will be in wp-content
-        // These logs are used for Selenium tests
-
         if ($event_type != 'recs')
             error_log($event_type);
+
+		if($event_type != 'creds' && get_option( 'cred_check_failed', $default = true )){
+	        return false;
+        }
+
 		try
 		{
-			// Gets user id and only proceeds if the user is authenticated
-			$user_id = get_current_user_id();
+            // Checks whether the event given in function arguments exists
+            if (!array_key_exists($event_type, $this->endpoints))
+                throw new Exception("Couldn't find an endpoint matching " . $event_type);
 
-			if ($user_id == 0)
-				throw new Exception("user isn't logged in");
+            // Concatenates the API URL and endpoint path
+            $url = $this->api_url . $this->endpoints[$event_type];
 
-			// Checks whether the event given in function arguments exists
-			if (!array_key_exists($event_type, self::$endpoints))
-				throw new Exception("Couldn't find an endpoint matching " . $event_type);
+            foreach ($this->fields[$event_type] as $field)
+            {
+                if (!isset($data[$field]) || !array_key_exists($field, $data))
+                {
+                    throw new Exception("Data validation failed - " . $field . " is not set");
+                }
+            }
 
-			// Concatenates the API URL and endpoint path
-			$url = self::$api_url . self::$endpoints[$event_type];
+            // Checks if the POST request response is needed
+            $blocking = false;
+            if ($event_type == "recs" || $event_type == "creds" || $event_type == "logs" || $event_type == "catalog")
+                $blocking = true;
 
-			foreach (self::$fields[$event_type] as $field)
-			{
-				if (!isset($data[$field]) || !array_key_exists($field, $data))
-				{
-					throw new Exception("Data validation failed - " . $field . " is not set");
-				}
-			}
+            $data_json = json_encode($data);
 
-			// Sends the data to the API
-			$data_string = json_encode( $data );
-            Recommender_WC_Log_Handler::logDebug($event_type .": " . $data_string);
+            // Sends the data to the API
+            Recommender_WC_Log_Handler::logDebug($event_type .": " . $data_json);
 
-			$ch = curl_init( $url );
-			curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
-					'Content-Type: application/json',
-					'Content-Length: ' . strlen( $data_string )
-				)
-			);
-			curl_setopt( $ch, CURLOPT_USERPWD, self::$shop_id . ":" . self::$key );
-			curl_setopt( $ch, CURLOPT_FRESH_CONNECT, 1 );
-			curl_setopt( $ch, CURLOPT_TIMEOUT_MS, $timeout );
-			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, "POST" );
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_string );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			$result = json_decode ( curl_exec( $ch ) );
+            $this->query_url = $url;
+            $this->query_args = array();
+            $this->post_args = array(
+                'timeout'   => $timeout,
+                'blocking'  => $blocking,
+                'headers'   => array(
+                    'Content-Type'   => 'application/json',
+                    'Content-Length' => strlen( $data_json ),
+                    'Authorization'  => 'Basic ' . base64_encode($this->shop_id . ":" . $this->key)
+                ),
+                'body'      => $data_json
+            );
+            $response = $this->dispatch();
 
-			//TODO should be fixed asap, not working like that
-            //if ($result != null)
-			//	throw new Exception($result['error']);
+            // TODO log something when it is blocking?
+            // currently there is no way to know if the request succeeded
+            if (!$blocking)
+                return true;
 
-			if($event_type == 'recs') return $result;
-			return true;
+            if (!is_wp_error($response)){
+                switch ($http_code = $response['response']['code']){
+                    case 200:
+	                    if($event_type == 'recs') return json_decode($response['body'])->items;
+                        return true;
+                    default:
+                        throw new Exception("Event type ".$event_type." with data_json: ".$data_json." gave an unexpected code: " . $http_code . " with message: " . $response['response']['message']);
+                }
+            } else {
+                throw new Exception(json_encode($response));
+            }
 		}
 		catch (Exception $exception)
 		{
             Recommender_WC_Log_Handler::logError('POST send failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
-            if($event_type == 'recs') return json_decode(json_encode(array()), FALSE);
             return false;
 		}
 	}
@@ -203,8 +206,7 @@ class Recommender_API
      */
 	public function has_connection(){
 	    try {
-            $url = self::$api_url . '/info';
-
+            $url = $this->api_url . '/info';
             $ch = curl_init( $url );
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "Accept: application/json"
@@ -228,10 +230,20 @@ class Recommender_API
         }
         catch (Exception $exception)
         {
-            Recommender_WC_Log_Handler::logCritical('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
+            Recommender_WC_Log_Handler::logError('Connection to the API has failed: ', array(get_class($exception), $exception->getMessage(), $exception->getCode()));
             return false;
         }
     }
 
+    /**
+     * Handle
+     *
+     * Override this method to perform any actions required
+     * during the async request.
+     */
+    protected function handle()
+    {
+        return;
+    }
 }
 ?>
