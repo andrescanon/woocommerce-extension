@@ -172,7 +172,7 @@ class Recommender_Event_Catcher
             'item_list' => $item_list,
             'website' => get_site_url(),
             'currency' => $currency,
-            'properties' => []
+            'properties' => ["extension_version"=>PLUGIN_NAME_VERSION]
         ];
         $this->api->send_post($data, 'purchase');
     }

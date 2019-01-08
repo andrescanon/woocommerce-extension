@@ -130,7 +130,7 @@ class Recommender_Product_Displayer
             'stacc_id' => Recommender::get_session_id(),
             'block_id' => $this->box_id,
             'website' => get_site_url(),
-            'properties' => []
+            'properties' => ["extension_version"=>PLUGIN_NAME_VERSION]
         ];
 
         $received_ids = $this->api->send_post($data_to_send, 'recs' );

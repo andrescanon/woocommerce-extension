@@ -107,7 +107,7 @@ class Recommender_Syncer
             }
             $data = [
                 'bulk' => $bulk,
-                'properties' => []
+                'properties' => ["extension_version"=>PLUGIN_NAME_VERSION]
             ];
 
             $response = $api->send_post($data, 'catalog');
