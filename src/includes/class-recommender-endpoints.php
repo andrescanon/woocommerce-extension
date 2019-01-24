@@ -101,9 +101,14 @@ class Recommender_Endpoints extends WP_REST_Controller {
 	    	return $handle;
 
 	    Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing started!");
-	    Recommender_Syncer::get_instance()->sync_logs();
-	    Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing done!");
-	    return new WP_REST_Response( array(), 200 );
+	    $success = Recommender_Syncer::get_instance()->sync_logs();
+	    if (!$success)
+        {
+            Recommender_WC_Log_Handler::get_instance()::logError("Log syncing failed!");
+            return new WP_REST_Response( array(), 500 );
+        }
+        Recommender_WC_Log_Handler::get_instance()::logNotice("Log syncing done!");
+        return new WP_REST_Response( array(), 200 );
     }
 
 	/**
